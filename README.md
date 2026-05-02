@@ -94,10 +94,6 @@ python -m pip install openai-whisper PyYAML
 python -m pip install -e .
 ```
 
-> The Python import path is `meeting_ai` (the project's original name). The
-> `momo` and `meeting-ai` commands point at the same entrypoint — a future
-> release will rename the package itself.
-
 ### 5. Install the local LLM
 
 Install Ollama and pull a model that fits your GPU.
@@ -151,8 +147,6 @@ Plain strings are enough.
 ```bash
 momo
 ```
-
-`meeting-ai` still works as an alias.
 
 ### 4. What you get
 

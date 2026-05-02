@@ -186,28 +186,5 @@ evidence toggles, edit `meeting_profile.md`.
 - PyTorch install selector: https://pytorch.org/get-started/locally/
 - Qwen model family: https://qwen.moe/
 
-## Development
-
-Run tests:
-
-```bash
-python -m unittest discover -s tests
-python -m compileall -q src tests
-```
-
-Run a fixture without a video:
-
-```bash
-momo process tests/fixtures/sample_transcript.json --run-id sample
-```
-
-## Repository Hygiene
-
-Large local artifacts are ignored:
-
-- `.venv/`, `.conda/`, `env/`
-- `videos/*`, `runs/*`
-- media files (`*.mp4`, `*.wav`, `*.m4a`)
-
-Only small examples and source live in the repo. Cloning shouldn't pull
-private meeting data along.
+Thanks to the teams behind Whisper, Ollama, PyTorch, and Qwen — MOMO would
+not exist without these projects.

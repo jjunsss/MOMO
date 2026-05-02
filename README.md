@@ -55,6 +55,11 @@ Conda handles `ffmpeg`, CUDA, and PyTorch with less friction than `venv`,
 especially on GPU machines.
 
 ```bash
+# Recent conda (≥ 26.x) requires accepting Terms of Service once.
+# Skip these two lines if you've already accepted them.
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
 conda create -n momo python=3.10 -y
 conda activate momo
 python -m pip install --upgrade pip setuptools wheel
@@ -90,6 +95,7 @@ CPU-only? Use the command from the official PyTorch installer page.
 ### 4. Get the source and install MOMO
 
 ```bash
+conda install -c conda-forge git -y    # skip if git is already on PATH
 git clone https://github.com/jjunsss/MOMO.git
 cd MOMO
 python -m pip install openai-whisper PyYAML

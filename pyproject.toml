@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "momo-meeting"
 version = "0.1.0"
-description = "Local-first meeting recap pipeline for long video recordings"
+description = "Evidence-backed meeting recaps from long recordings"
 requires-python = ">=3.8"
 dependencies = [
   "PyYAML>=5.4",

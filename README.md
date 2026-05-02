@@ -52,22 +52,32 @@ runs/{run_id}/
 
 ## Quick Start
 
-### 1. Install system tools
+### 1. Create a Conda environment
 
-Install `ffmpeg` and Python 3.8+.
+MOMO is easiest to run in a Conda environment, especially on GPU machines.
 
-Ubuntu/Debian:
+```bash
+conda create -n momo python=3.10 -y
+conda activate momo
+python -m pip install --upgrade pip setuptools wheel
+```
+
+`venv` also works, but Conda is the recommended path because it handles native
+packages such as `ffmpeg`, CUDA, and PyTorch more comfortably.
+
+### 2. Install ffmpeg
+
+With Conda:
+
+```bash
+conda install -c conda-forge ffmpeg -y
+```
+
+Or use your system package manager:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y ffmpeg python3-venv python3-pip
-```
-
-### 2. Create a virtualenv
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip setuptools wheel
+sudo apt-get install -y ffmpeg
 ```
 
 ### 3. Install PyTorch
@@ -75,7 +85,7 @@ python3 -m venv .venv
 For CUDA 12.1:
 
 ```bash
-.venv/bin/python -m pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.4.1 torchaudio==2.4.1
+conda install pytorch torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y
 ```
 
 For CPU-only machines, use the command recommended by the official PyTorch
@@ -84,8 +94,8 @@ installer page.
 ### 4. Install MOMO
 
 ```bash
-.venv/bin/python -m pip install openai-whisper PyYAML
-.venv/bin/python -m pip install -e .
+python -m pip install openai-whisper PyYAML
+python -m pip install -e .
 ```
 
 ### 5. Optional: enable local LLM summaries
@@ -141,13 +151,13 @@ Keep it simple. Strings are enough.
 ### 3. Run
 
 ```bash
-.venv/bin/momo
+momo
 ```
 
 `meeting-ai` is kept as a compatibility alias:
 
 ```bash
-.venv/bin/meeting-ai
+meeting-ai
 ```
 
 ## Configuration
@@ -214,14 +224,14 @@ to debug, and safer to review when the summary looks suspicious.
 Run tests:
 
 ```bash
-.venv/bin/python -m unittest discover -s tests
-.venv/bin/python -m compileall -q src tests
+python -m unittest discover -s tests
+python -m compileall -q src tests
 ```
 
 Run a fixture without a video:
 
 ```bash
-.venv/bin/momo process tests/fixtures/sample_transcript.json --run-id sample
+momo process tests/fixtures/sample_transcript.json --run-id sample
 ```
 
 ## Repository Hygiene
@@ -229,6 +239,8 @@ Run a fixture without a video:
 Large local artifacts are ignored:
 
 - `.venv/`
+- `.conda/`
+- `env/`
 - `videos/*`
 - `runs/*`
 - media files such as `*.mp4`, `*.wav`, `*.m4a`

@@ -9,6 +9,8 @@ AGENTS.md
 CLAUDE.md
 LOCAL_ENV.md
 .venv/
+.conda/
+env/
 .env
 data/
 runs/*

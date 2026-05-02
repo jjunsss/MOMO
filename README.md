@@ -1,10 +1,8 @@
 # MOMO
 
-**Meetings go in. Decisions come out.**
-
-MOMO turns long Zoom recordings into crisp, evidence-backed Markdown recaps.
-Drop a recording into `videos/`, add the few things you care about to
-`topic_details.json`, and get a clean summary plus a separate evidence report.
+MOMO turns long Zoom recordings into Markdown meeting recaps. Drop a recording
+into `videos/`, add the few things you care about to `topic_details.json`, and
+get a summary plus a separate evidence file.
 
 ## The Pipeline
 

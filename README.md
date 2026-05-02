@@ -171,21 +171,8 @@ runs/{run_id}/
     chunk_analysis.jsonl
 ```
 
-## Configuration
-
-Most runs only need `topic_details.json`.
-
-Advanced defaults live in `meeting_profile.md`:
-
-- ASR model and decoding options
-- LLM provider/model
-- chunk sizes
-- output sections
-- evidence report toggles
-
-ASR default is Whisper `large-v3`. The profile turns off previous-text
-conditioning and keeps silence thresholds explicit, which cuts the
-repetition artifacts long meetings tend to produce.
+To tune ASR decoding, LLM provider/model, chunk sizes, output sections, or
+evidence toggles, edit `meeting_profile.md`.
 
 ## Output
 

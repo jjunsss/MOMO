@@ -170,15 +170,12 @@ evidence toggles, edit `meeting_profile.md`.
 
 ## Output
 
-Two files, two jobs:
-
-- `summaries/final_summary.md` — the recap you share: TL;DR, key topics,
-  decisions, action items, next meeting, and worth-noting context. Written as
-  prose and tables, no audit metadata.
-- `evidence/summary_evidence.md` — the same items, each paired with the
-  transcript snippet it came from, the timestamp range, and a confidence label
-  (`strong` = directly quoted, `weak` = paraphrased, `inferred` = reasoned
-  from context). Open this when a line in the recap looks off.
+- `summaries/final_summary.md` — **Final recap.** TL;DR, key topics, decisions,
+  action items, next meeting, worth-noting. Prose and tables.
+- `evidence/summary_evidence.md` — **Evidence file.** Each item from the recap
+  with the transcript snippet it came from, the timestamp range, and a
+  confidence label (`strong` = direct quote, `weak` = paraphrase,
+  `inferred` = reasoned from context).
 
 ## References
 

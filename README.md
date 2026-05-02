@@ -14,7 +14,7 @@ Four stages, each with one job:
 |---|---|---|
 | **Speech → Text** | OpenAI Whisper `large-v3` (local, GPU) | the recording becomes a Korean transcript with per-segment timestamps |
 | **Filter** | rule-based chunk salience (no LLM) | each 6–10 min chunk is marked *kept* or *skipped* before any LLM sees it |
-| **Recap** | Qwen 3.5 9B via Ollama *(or any OpenAI-compatible endpoint)* | reads the kept chunks and produces the meeting summary |
+| **Recap** | Qwen 3.5 9B via Ollama *(or any powerful LLM you can use)* | reads the kept chunks and produces the meeting summary |
 | **Render** | deterministic Markdown renderer (no LLM) | turns the validated JSON into the public recap and the evidence file |
 
 ```text

@@ -48,6 +48,35 @@ Defaults assume a 16 GB local GPU (RTX 4080-class): Whisper `large-v3` for
 transcription, Qwen 3.5 9B with thinking for the recap. Swap any stage in
 `meeting_profile.md`.
 
+## Example
+
+A 52-second Korean clip on presentation tips — CC-BY licensed, fully
+reproducible.
+
+**Source**: [발표잘하는 방법! 발표잘하는 방법 3가지](https://youtu.be/pYnVm6QM8fo)
+by 김지혜TV리스피치 (Creative Commons Attribution).
+
+Reproduce:
+
+```bash
+yt-dlp -f 'best[height<=480]/best' -o 'videos/demo.mp4' https://youtu.be/pYnVm6QM8fo
+momo
+```
+
+What MOMO produces (`final_summary.md` excerpt):
+
+> ### TL;DR
+> 발표 기술 향상 3가지 핵심 전략 (오프닝/크로징 준비, 순서 단순화, 질문 대신
+> 마무리 멘트 사용) 을 소개하고, 질문 답변은 추후 연락으로 미룬다.
+>
+> ### Worth Noting
+> - 발표에서 떨지 않는 것이 가장 중요함.
+> - 크로징 멘트는 질문보다는 '마치겠습니다'라는 멘트를 사용하는 것이 좋음.
+
+End-to-end on RTX 4080: ~70 seconds (Whisper transcribe + Qwen 3.5 9B recap +
+render). The matching evidence file under `evidence/summary_evidence.md` shows
+the transcript line and timestamp behind every claim.
+
 ## Quick Start
 
 ### 1. Create a Conda environment

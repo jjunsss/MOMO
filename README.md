@@ -1,11 +1,9 @@
 # MOMO
 
 *Short for **M**eeting **MO**ments.* MOMO turns long Zoom recordings into
-clean meeting recaps.
-
-Drop a recording into `videos/`, write the few things you care about in
-`topic_details.json`, and MOMO produces a Markdown recap plus a separate
-evidence file.
+clean meeting recaps. Drop a recording into `videos/`, write the few things
+you care about in `topic_details.json`, and MOMO produces a Markdown recap
+plus a separate evidence file.
 
 ## The Pipeline
 

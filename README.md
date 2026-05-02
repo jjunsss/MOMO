@@ -47,46 +47,6 @@ Defaults assume a 16 GB local GPU (RTX 4080-class): Whisper `large-v3` for
 transcription, Qwen 3.5 9B with thinking for the recap. Swap any stage in
 `meeting_profile.md`.
 
-## Why MOMO
-
-What I want from a meeting recap, in order:
-
-- the shared summary should read clean — no timestamps, no audit metadata
-- the evidence should still exist, just in a separate file
-- I shouldn't edit prompts or YAML before every meeting
-- long Korean meetings need date/time and repetition safeguards a raw
-  transcript-to-summary pass does not give you
-
-n8n-style video → Whisper → LLM templates handle the wiring fine; what they
-miss is evidence separation, GPU-aware defaults, restartable runs, topic
-steering, and a recap flow that doesn't just sort chunks by time.
-
-## What It Does
-
-MOMO turns this:
-
-```text
-videos/meeting.mp4
-topic_details.json
-```
-
-into this:
-
-```text
-runs/{run_id}/
-  summaries/
-    final_summary.md       # the recap you share
-    final_summary.json     # structured output
-  evidence/
-    summary_evidence.md    # timestamps, support levels, transcript snippets
-    final_summary.with_evidence.json
-  transcript/
-    normalized_transcript.md
-    raw_transcript.json
-  chunks/
-    chunk_analysis.jsonl
-```
-
 ## Quick Start
 
 ### 1. Create a Conda environment
@@ -193,6 +153,23 @@ momo
 ```
 
 `meeting-ai` still works as an alias.
+
+### 4. What you get
+
+```text
+runs/{run_id}/
+  summaries/
+    final_summary.md       # the recap you share
+    final_summary.json     # structured output
+  evidence/
+    summary_evidence.md    # timestamps, support levels, transcript snippets
+    final_summary.with_evidence.json
+  transcript/
+    normalized_transcript.md
+    raw_transcript.json
+  chunks/
+    chunk_analysis.jsonl
+```
 
 ## Configuration
 

@@ -1,0 +1,175 @@
+{
+  "action_items": [
+    {
+      "deadline": "unknown",
+      "owner": "unknown",
+      "priority": "medium",
+      "task": "질문에 대한 답변은 당일 다 하지 못하면 추후 성향이나 유선상으로 알려드려야 함."
+    }
+  ],
+  "date": "unknown",
+  "decisions": [],
+  "duration": "00:00:50",
+  "executive_summary": "발표자 불안감 해소와 효과적인 발표를 위한 3 가지 팁을 제시함. 오프닝과 크로징의 중요성, 복잡한 순서 대신 간결하게 말하기, 그리고 질문 대신 '마치겠습니다' 멘트를 사용하는 것이 중요함을 강조함. 발표 후 질의응답은 당일 해결 불가 시 추후 연락으로 처리됨.",
+  "key_topics": [
+    {
+      "summary": "발표에서 가장 중요한 것은 떨지 않는 것이며, 이를 위해 오프닝과 크로징을 준비하고, 순서를 유려하게 짧게 말하며, 크로징 멘트는 질문 대신 '마치겠습니다'로 마무리하는 것이 효과적임.",
+      "supporting_points": [
+        "떨지 않는 것이 가장 중요함.",
+        "오프닝과 크로징을 미리 준비해야 함.",
+        "순서는 유려하게 짧게 말해야 함.",
+        "크로징 멘트는 질문보다는 마치겠습니다 멘트를 사용해야 함."
+      ],
+      "title": "발표 불안 해소 및 핵심 전략",
+      "topic_id": "t01",
+      "why_it_matters": "발표자의 심리적 안정과 청중의 집중도를 높여 발표 효과를 극대화하기 위함."
+    }
+  ],
+  "meeting_id": "demo_korean_1min",
+  "metadata": {
+    "chunk_count": 1,
+    "created_at": "2026-05-02T15:00:35Z",
+    "extraction": {
+      "analyzed_chunks": 1,
+      "strategy": "deterministic_salience_map"
+    },
+    "kept_chunk_count": 1,
+    "model_info": {
+      "model": "qwen3.5:9b",
+      "provider": "ollama"
+    },
+    "output_sections": [
+      {
+        "enabled": true,
+        "id": "tldr",
+        "style": "paragraph",
+        "title": "TL;DR"
+      },
+      {
+        "enabled": true,
+        "id": "executive_summary",
+        "style": "paragraph",
+        "title": "핵심 요약"
+      },
+      {
+        "enabled": true,
+        "id": "key_topics",
+        "style": "table",
+        "title": "핵심 논의"
+      },
+      {
+        "enabled": true,
+        "id": "decisions",
+        "style": "table",
+        "title": "결정사항"
+      },
+      {
+        "enabled": true,
+        "id": "action_items",
+        "style": "checklist",
+        "title": "Action Items"
+      },
+      {
+        "enabled": true,
+        "id": "next_meeting",
+        "style": "table",
+        "title": "다음 미팅 / Follow-up"
+      },
+      {
+        "enabled": true,
+        "id": "worth_noting",
+        "style": "bullets",
+        "title": "Worth Noting"
+      },
+      {
+        "enabled": true,
+        "id": "open_questions",
+        "style": "bullets",
+        "title": "Open Questions"
+      },
+      {
+        "enabled": false,
+        "id": "required_search_report",
+        "style": "table",
+        "title": "사용자 필수 탐색 항목 결과"
+      },
+      {
+        "enabled": false,
+        "id": "appendix",
+        "style": "metadata",
+        "title": "Appendix"
+      }
+    ],
+    "pipeline_version": "0.3.0",
+    "rendering": {
+      "direct_summary_max_tokens": 8192,
+      "enable_critique": false,
+      "include_skipped_chunk_stats": true,
+      "key_topics_max": 8,
+      "llm_summary_mode": "fast",
+      "max_items_per_slot": 8,
+      "max_per_slot_per_chunk": 3,
+      "output_language": "ko",
+      "single_pass_token_limit": 60000,
+      "worth_noting_max": 8,
+      "write_chunk_analysis_jsonl": true,
+      "write_evidence_report": true,
+      "write_transcript_markdown": true
+    },
+    "skipped_chunk_count": 0,
+    "synthesis": {
+      "llm_calls": 1,
+      "mode": "fast_direct_json",
+      "two_pass": false,
+      "uses_salience_map": true
+    }
+  },
+  "next_meeting": {
+    "agenda": [],
+    "date": "unknown",
+    "preparation": [],
+    "status": "not_found",
+    "time": "unknown"
+  },
+  "open_questions": [],
+  "required_search_report": [
+    {
+      "label": "다음 미팅",
+      "missing_reason": "aliases and chunk-level hits did not produce a clear match.",
+      "required_item_id": "next_meeting",
+      "status": "not_found",
+      "summary": "명시적으로 언급되지 않았습니다."
+    },
+    {
+      "label": "해야 할 일",
+      "missing_reason": "aliases and chunk-level hits did not produce a clear match.",
+      "required_item_id": "action_items",
+      "status": "not_found",
+      "summary": "명시적으로 언급되지 않았습니다."
+    },
+    {
+      "label": "Worth Noting",
+      "missing_reason": null,
+      "required_item_id": "worth_noting",
+      "status": "found",
+      "summary": "관련 표현 1건이 감지되었습니다: 중요"
+    }
+  ],
+  "source_file": "videos/demo_korean_1min.mp4",
+  "title": "demo_korean_1min",
+  "tldr": "발표 기술 향상 3 가지 핵심 전략 (오프닝/크로징 준비, 순서 단순화, 질문 대신 마무리 멘트 사용) 을 소개하고, 질문 답변은 추후 연락으로 미룬다.",
+  "worth_noting": [
+    {
+      "importance": "high",
+      "note": "발표에서 떨지 않는 것이 가장 중요함.",
+      "related_topic": "발표 불안 해소 및 핵심 전략",
+      "why_it_matters": "발표자의 신뢰도를 높이고 청중의 집중을 유지하는 데 필수적임."
+    },
+    {
+      "importance": "medium",
+      "note": "크로징 멘트는 질문보다는 '마치겠습니다'라는 멘트를 사용하는 것이 좋음.",
+      "related_topic": "발표 불안 해소 및 핵심 전략",
+      "why_it_matters": "발표를 깔끔하게 마무리하고 청중의 추가 질문 부담을 줄여줌."
+    }
+  ]
+}

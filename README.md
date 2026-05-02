@@ -1,28 +1,67 @@
 # MOMO
 
-MOMO is a local-first meeting recap tool for long Zoom/video recordings.
+*Short for **M**eeting **MO**ments.* MOMO turns long Zoom recordings into clean
+meeting recaps that run on your own GPU.
 
 Drop a recording into `videos/`, write the few things you care about in
-`topic_details.json`, and MOMO produces a clean Markdown summary plus a separate
-evidence report you can inspect when something looks important.
+`topic_details.json`, and MOMO produces a Markdown recap plus a separate
+evidence file you can spot-check when a claim looks off.
 
-## Why MOMO?
+## The Pipeline
 
-I tried to keep this close to the way I actually review research meetings:
+Four stages, each with one job:
 
-- the shared summary should be clean, not full of timestamps and audit metadata
-- the evidence should still exist, just in a separate place
-- the user should not edit prompts or complicated YAML before every meeting
-- Korean long-form meetings need better date/time and repetition safeguards than
-  a raw transcript-to-summary pass
-- local video and transcript data should stay local unless the user explicitly
-  chooses a cloud LLM endpoint
+| Stage | Component | Role |
+|---|---|---|
+| **Speech → Text** | OpenAI Whisper `large-v3` (local, GPU) | the recording becomes a Korean transcript with per-segment timestamps |
+| **Filter** | rule-based chunk salience (no LLM) | each 6–10 min chunk is marked *kept* or *skipped* before any LLM sees it |
+| **Recap** | Qwen 3.5 9B via Ollama *(or any OpenAI-compatible endpoint)* | reads the kept chunks and produces the meeting summary |
+| **Render** | deterministic Markdown renderer (no LLM) | turns the validated JSON into the public recap and the evidence file |
 
-Existing workflow templates are useful, especially n8n-style video to Whisper to
-LLM automation, but they were not quite enough for this use case. The missing
-parts were evidence separation, local GPU-aware defaults, restartable run
-artifacts, user-friendly topic steering, and a summary flow that avoids simply
-sorting chunks chronologically.
+```text
+videos/meeting.mp4
+        │
+        ▼   ffmpeg
+audio.wav  (16 kHz mono)
+        │
+        ▼   Whisper large-v3
+raw_transcript.json ── normalize ──▶ normalized_transcript.json
+        │
+        ▼   chunk (6–10 min, 30 s overlap)
+chunks.json
+        │
+        ▼   rule-based salience pre-pass
+chunk_analysis.jsonl   (kept / skipped)
+        │
+        ▼   LLM: per-slot extraction
+        │   (thinking on, JSON schema enforced)
+slot_extracts.jsonl
+        │
+        ▼   LLM: 2-pass summary write  (prose → strict JSON)
+final_summary.draft.json
+        │
+        ▼   LLM: CoVe critique  (evidence-anchored verification)
+final_summary.json ── deterministic render ──▶ final_summary.md
+                                                + summary_evidence.md
+```
+
+Defaults assume a 16 GB local GPU (RTX 4080-class): Whisper `large-v3` for
+transcription, Qwen 3.5 9B with thinking for the recap. Swap any stage in
+`meeting_profile.md`.
+
+## Why MOMO
+
+What I want from a meeting recap, in order:
+
+- the shared summary should read clean — no timestamps, no audit metadata
+- the evidence should still exist, just in a separate file
+- I shouldn't edit prompts or YAML before every meeting
+- long Korean meetings need date/time and repetition safeguards a raw
+  transcript-to-summary pass does not give you
+
+n8n-style video → Whisper → LLM templates handle the wiring fine; what they
+miss is evidence separation, GPU-aware defaults, restartable runs, topic
+steering, and a recap flow that doesn't just sort chunks by time.
 
 ## What It Does
 
@@ -38,8 +77,8 @@ into this:
 ```text
 runs/{run_id}/
   summaries/
-    final_summary.md       # clean human-facing recap
-    final_summary.json     # public structured output
+    final_summary.md       # the recap you share
+    final_summary.json     # structured output
   evidence/
     summary_evidence.md    # timestamps, support levels, transcript snippets
     final_summary.with_evidence.json
@@ -54,7 +93,8 @@ runs/{run_id}/
 
 ### 1. Create a Conda environment
 
-MOMO is easiest to run in a Conda environment, especially on GPU machines.
+Conda handles `ffmpeg`, CUDA, and PyTorch with less friction than `venv`,
+especially on GPU machines.
 
 ```bash
 conda create -n momo python=3.10 -y
@@ -62,8 +102,7 @@ conda activate momo
 python -m pip install --upgrade pip setuptools wheel
 ```
 
-`venv` also works, but Conda is the recommended path because it handles native
-packages such as `ffmpeg`, CUDA, and PyTorch more comfortably.
+`venv` works too if you already have ffmpeg + CUDA set up.
 
 ### 2. Install ffmpeg
 
@@ -88,8 +127,7 @@ For CUDA 12.1:
 conda install pytorch torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y
 ```
 
-For CPU-only machines, use the command recommended by the official PyTorch
-installer page.
+CPU-only? Use the command from the official PyTorch installer page.
 
 ### 4. Install MOMO
 
@@ -98,25 +136,27 @@ python -m pip install openai-whisper PyYAML
 python -m pip install -e .
 ```
 
-### 5. Optional: enable local LLM summaries
+> The Python import path is `meeting_ai` (the project's original name). The
+> `momo` and `meeting-ai` commands point at the same entrypoint — a future
+> release will rename the package itself.
+
+### 5. Install the local LLM
 
 Install Ollama and pull a model that fits your GPU.
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ollama serve
-ollama pull qwen2.5:14b
+ollama pull qwen3.5:9b
 ```
 
 Then set the model in `meeting_profile.md`:
 
 ```text
 llm_provider: ollama
-llm_model: qwen2.5:14b
+llm_model: qwen3.5:9b
 llm_base_url: http://localhost:11434
 ```
-
-If you do not run an LLM provider, MOMO falls back to deterministic extraction.
 
 ## How To Use
 
@@ -127,11 +167,11 @@ videos/
   Screen_Recording_20260429_172841_Zoom.mp4
 ```
 
-The newest media file is selected automatically.
+The newest media file is picked automatically.
 
 ### 2. Edit `topic_details.json`
 
-Keep it simple. Strings are enough.
+Plain strings are enough.
 
 ```json
 {
@@ -154,15 +194,11 @@ Keep it simple. Strings are enough.
 momo
 ```
 
-`meeting-ai` is kept as a compatibility alias:
-
-```bash
-meeting-ai
-```
+`meeting-ai` still works as an alias.
 
 ## Configuration
 
-Most users only edit `topic_details.json`.
+Most runs only need `topic_details.json`.
 
 Advanced defaults live in `meeting_profile.md`:
 
@@ -172,43 +208,19 @@ Advanced defaults live in `meeting_profile.md`:
 - output sections
 - evidence report toggles
 
-The current local-first default is Whisper `large-v3` for ASR. The profile also
-turns off previous-text conditioning and keeps silence thresholds explicit to
-reduce long-meeting repetition artifacts.
+ASR default is Whisper `large-v3`. The profile turns off previous-text
+conditioning and keeps silence thresholds explicit, which cuts the
+repetition artifacts long meetings tend to produce.
 
-## Output Philosophy
+## Output
 
-MOMO writes two kinds of output:
+Two files, two jobs:
 
-- `summaries/final_summary.md`: clean enough to share
-- `evidence/summary_evidence.md`: detailed enough to verify
-
-That means final summaries avoid noisy text such as `owner: unknown`, support
-labels, raw timestamps, or transcript snippets. Those details are still
-preserved in `evidence/`.
-
-## Tech Stack
-
-- Python package with a `src/` layout
-- OpenAI Whisper for local ASR
-- PyTorch/CUDA for GPU transcription when available
-- Ollama or OpenAI-compatible endpoints for optional LLM synthesis
-- deterministic chunk salience analysis before the LLM pass
-- JSON artifacts for restartability and debugging
-- Markdown renderers for clean public output and separate evidence output
-
-## Design Notes
-
-The pipeline is intentionally staged:
-
-```text
-media -> audio -> raw transcript -> normalized transcript -> chunks
--> deterministic chunk analysis -> required search report
--> LLM or deterministic synthesis -> validation -> Markdown
-```
-
-The intermediate files are not clutter. They make long runs restartable, easier
-to debug, and safer to review when the summary looks suspicious.
+- `summaries/final_summary.md` — the public recap. No `owner: unknown`, no
+  support labels, no raw timestamps.
+- `evidence/summary_evidence.md` — every claim with its timestamp, support
+  level, and the transcript line behind it. Open this when something in the
+  recap looks wrong.
 
 ## References
 
@@ -238,13 +250,9 @@ momo process tests/fixtures/sample_transcript.json --run-id sample
 
 Large local artifacts are ignored:
 
-- `.venv/`
-- `.conda/`
-- `env/`
-- `videos/*`
-- `runs/*`
-- media files such as `*.mp4`, `*.wav`, `*.m4a`
+- `.venv/`, `.conda/`, `env/`
+- `videos/*`, `runs/*`
+- media files (`*.mp4`, `*.wav`, `*.m4a`)
 
-Keep only small examples and source files in GitHub. MOMO should be easy to
-clone, install, and try without dragging private meeting data along for the
-ride.
+Only small examples and source live in the repo. Cloning shouldn't pull
+private meeting data along.

@@ -221,7 +221,7 @@ Run tests:
 Run a fixture without a video:
 
 ```bash
-.venv/bin/meeting-ai process tests/fixtures/sample_transcript.json --run-id sample
+.venv/bin/momo process tests/fixtures/sample_transcript.json --run-id sample
 ```
 
 ## Repository Hygiene

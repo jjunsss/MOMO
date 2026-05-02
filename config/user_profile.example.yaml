@@ -1,0 +1,71 @@
+meeting_profile:
+  default_title: Zoom Meeting Summary
+  output_language: ko
+  tone: professional_research_notes
+
+required_search_items:
+  - id: next_meeting
+    label: 다음 미팅
+    required: true
+    priority: high
+    aliases:
+      - 다음 미팅
+      - 다음 회의
+      - 다음 주
+      - next meeting
+      - follow-up meeting
+  - id: action_items
+    label: 해야 할 일
+    required: true
+    priority: high
+    aliases:
+      - 해야 할 일
+      - 액션 아이템
+      - TODO
+      - action item
+      - next step
+      - 확인해 주세요
+      - 정리해 주세요
+      - 준비해 주세요
+  - id: worth_noting
+    label: Worth Noting
+    required: true
+    priority: medium
+    aliases:
+      - 중요
+      - 참고
+      - 리스크
+      - 우려
+      - 기억
+      - worth noting
+
+output_sections:
+  - id: tldr
+    title: TL;DR
+    enabled: true
+    style: paragraph
+  - id: key_topics
+    title: 핵심 논의
+    enabled: true
+    style: table
+  - id: decisions
+    title: 결정사항
+    enabled: true
+    style: table
+  - id: action_items
+    title: Action Items
+    enabled: true
+    style: checklist
+  - id: next_meeting
+    title: 다음 미팅 / Follow-up
+    enabled: true
+    style: table
+  - id: worth_noting
+    title: Worth Noting
+    enabled: true
+    style: bullets
+  - id: open_questions
+    title: Open Questions
+    enabled: true
+    style: bullets
+

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "momo-meeting"
+version = "0.1.0"
+description = "Local-first meeting recap pipeline for long video recordings"
+requires-python = ">=3.8"
+dependencies = [
+  "PyYAML>=5.4",
+]
+
+[project.scripts]
+momo = "meeting_ai.cli:main"
+meeting-ai = "meeting_ai.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

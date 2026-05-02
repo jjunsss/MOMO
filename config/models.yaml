@@ -1,0 +1,26 @@
+asr:
+  provider: openai_whisper
+  model: large-v3
+  language: ko
+  device: cuda
+  fp16: true
+  temperature: 0.0
+  condition_on_previous_text: false
+  no_speech_threshold: 0.6
+  logprob_threshold: -1.0
+  compression_ratio_threshold: 2.4
+  diarization: false
+
+llm:
+  provider: deterministic_mvp
+  model: rule_based
+  temperature: 0.0
+  structured_outputs: true
+
+embedding:
+  provider: none
+  model: none
+
+fallbacks:
+  allow_cloud_llm: false
+  allow_cloud_asr: false

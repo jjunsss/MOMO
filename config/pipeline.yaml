@@ -1,0 +1,15 @@
+chunking:
+  target_minutes: 6
+  max_minutes: 10
+  overlap_seconds: 30
+
+verification:
+  enabled: true
+  evidence_window_seconds: 90
+
+rendering:
+  output_language: ko
+  include_timestamps: true
+  include_skipped_chunk_stats: true
+  llm_summary_mode: fast
+  enable_critique: false

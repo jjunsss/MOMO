@@ -1,0 +1,40 @@
+{
+  "meeting_id": "sample_meeting_001",
+  "title": "Sample Zoom Planning Meeting",
+  "source_file": "sample_zoom.mp4",
+  "language": "ko",
+  "duration_sec": 420,
+  "segments": [
+    {
+      "id": "t000001",
+      "start": 0,
+      "end": 45,
+      "text": "오늘은 Zoom 회의 요약 파이프라인 MVP 범위를 정리하겠습니다."
+    },
+    {
+      "id": "t000002",
+      "start": 45,
+      "end": 120,
+      "text": "우선 transcript JSON에서 chunk analysis JSONL을 만들고 final summary JSON을 거쳐 Markdown을 렌더링하기로 결정했습니다."
+    },
+    {
+      "id": "t000003",
+      "start": 120,
+      "end": 210,
+      "text": "액션 아이템은 config 모델 설정을 분리하고 required search report를 반드시 남기는 것입니다. 이 부분은 다음 단계에서 확인해 주세요."
+    },
+    {
+      "id": "t000004",
+      "start": 210,
+      "end": 300,
+      "text": "중요한 참고 사항은 로컬 GPU가 16GB급이라서 ASR과 LLM을 동시에 크게 올리면 리스크가 있다는 점입니다."
+    },
+    {
+      "id": "t000005",
+      "start": 300,
+      "end": 390,
+      "text": "다음 미팅에서는 실제 Zoom 파일을 넣고 ASR provider를 붙이는 작업을 논의하겠습니다."
+    }
+  ]
+}
+

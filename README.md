@@ -1,11 +1,11 @@
 # MOMO
 
-*Short for **M**eeting **MO**ments.* MOMO turns long Zoom recordings into clean
-meeting recaps that run on your own GPU.
+*Short for **M**eeting **MO**ments.* MOMO turns long Zoom recordings into
+clean meeting recaps.
 
 Drop a recording into `videos/`, write the few things you care about in
 `topic_details.json`, and MOMO produces a Markdown recap plus a separate
-evidence file you can spot-check when a claim looks off.
+evidence file.
 
 ## The Pipeline
 

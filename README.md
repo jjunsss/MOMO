@@ -87,9 +87,11 @@ conda install pytorch torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y
 
 CPU-only? Use the command from the official PyTorch installer page.
 
-### 4. Install MOMO
+### 4. Get the source and install MOMO
 
 ```bash
+git clone https://github.com/jjunsss/MOMO.git
+cd MOMO
 python -m pip install openai-whisper PyYAML
 python -m pip install -e .
 ```

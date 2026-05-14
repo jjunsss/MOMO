@@ -16,6 +16,10 @@ class ColabNotebookTest(unittest.TestCase):
         )
 
         self.assertIn("MOMO Colab Quick Trial", source)
+        self.assertIn("셀을 위에서 아래로 하나씩 실행하세요", source)
+        self.assertIn("Run each cell one by one from top to bottom", source)
+        self.assertIn("GPU 확인", source)
+        self.assertIn("GPU check", source)
         self.assertIn("torch.cuda.is_available", source)
         self.assertIn('ASR_MODEL = "medium"', source)
         self.assertIn('LLM_NUM_CTX = "8192"', source)

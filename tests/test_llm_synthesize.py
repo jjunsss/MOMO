@@ -1,4 +1,4 @@
-"""Tests for the LLM synthesis path using a deterministic stub provider."""
+"""Tests for the LLM synthesis path using a canned LLM provider."""
 
 from __future__ import annotations
 
@@ -145,10 +145,9 @@ class LLMSynthesisTest(unittest.TestCase):
             chunk_analyses=self.analyses,
         )
 
-    def test_factory_returns_deterministic_stub_for_default_provider(self) -> None:
-        provider = build_llm_provider({"provider": "deterministic_mvp"})
-        self.assertEqual(provider.name, "deterministic_mvp")
-        self.assertEqual(provider.call("anything").text, "")
+    def test_factory_rejects_disabled_stub_provider(self) -> None:
+        with self.assertRaisesRegex(ValueError, "rule-based LLM fallback is disabled"):
+            build_llm_provider({"provider": "deterministic_mvp"})
 
     def test_factory_rejects_unknown_provider(self) -> None:
         with self.assertRaises(ValueError):

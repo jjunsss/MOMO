@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
+
 
 from meeting_ai.nodes.analyze_chunk import analyze_chunks
 from meeting_ai.nodes.audio import extract_audio
@@ -17,7 +18,6 @@ from meeting_ai.nodes.llm_extract import extract_per_slot
 from meeting_ai.nodes.llm_synthesize import synthesize_with_llm
 from meeting_ai.nodes.normalize import normalize_transcript
 from meeting_ai.nodes.required_search import build_required_search_report
-from meeting_ai.nodes.synthesize import synthesize_summary
 from meeting_ai.nodes.verify import verify_summary
 from meeting_ai.providers.asr.openai_whisper import transcribe_audio
 from meeting_ai.providers.llm import LLMError, build_llm_provider
@@ -29,6 +29,9 @@ from meeting_ai.renderers.markdown import render_summary_markdown
 from meeting_ai.renderers.transcript import render_transcript_markdown
 from meeting_ai.schemas.summary import validate_final_summary
 from meeting_ai.utils.io import ensure_dir, read_json, write_json, write_jsonl, write_text
+
+
+StageCallback = Optional[Callable[[str], None]]
 
 
 @dataclass(frozen=True)
@@ -68,14 +71,23 @@ def process_transcript_source(
     profile: Dict[str, Any],
     pipeline_config: Dict[str, Any],
     models_config: Optional[Dict[str, Any]] = None,
+    on_stage: StageCallback = None,
 ) -> PipelineResult:
+    def emit(stage: str) -> None:
+        if on_stage is not None:
+            on_stage(stage)
+
+    emit("prepare")
     actual_run_id = run_id or _default_run_id(source_path)
     paths = _prepare_run_dirs(runs_dir, actual_run_id)
     models = models_config or {}
     rendering = pipeline_config.get("rendering", {})
     extraction_keywords = pipeline_config.get("extraction", {}).get("keywords")
 
-    raw_transcript = _load_or_create_transcript(source_path, paths, models.get("asr", {}))
+    raw_transcript = _load_or_create_transcript(
+        source_path, paths, models.get("asr", {}), on_stage=on_stage
+    )
+    emit("chunk")
     normalized = normalize_transcript(raw_transcript)
     chunks = build_chunks(normalized, pipeline_config.get("chunking", {}))
     analyses = analyze_chunks(
@@ -90,85 +102,61 @@ def process_transcript_source(
     )
 
     llm_config = models.get("llm", {})
-    llm_provider = build_llm_provider(llm_config)
-    use_llm_synth = llm_provider.name not in {"deterministic_mvp"}
+    try:
+        llm_provider = build_llm_provider(llm_config)
+    except ValueError as exc:
+        raise LLMError(str(exc)) from exc
     llm_summary_mode = str(rendering.get("llm_summary_mode", "fast")).lower().strip()
     slot_extracts: list = []
     extraction_meta: dict = {}
-    if use_llm_synth:
-        try:
-            if llm_summary_mode in {"fast", "direct", "direct_json", "one_pass"}:
-                draft_summary = synthesize_direct_with_llm(
-                    transcript=normalized,
-                    chunks=chunks,
-                    required_search_report=required_report,
-                    profile=profile,
-                    rendering=rendering,
-                    llm=llm_provider,
-                    run_id=actual_run_id,
-                    source_file=str(source_path),
-                    chunk_analyses=analyses,
-                    model_info={"provider": llm_provider.name, "model": llm_config.get("model")},
-                )
-            else:
-                slot_extracts, extraction_meta = extract_per_slot(
-                    transcript=normalized,
-                    chunks=chunks,
-                    profile=profile,
-                    llm=llm_provider,
-                    single_pass_token_limit=int(
-                        rendering.get("single_pass_token_limit", 60_000)
-                    ),
-                    max_items_per_slot=int(rendering.get("max_items_per_slot", 8)),
-                    meeting_id=str(normalized.get("meeting_id", actual_run_id)),
-                )
-                draft_summary = synthesize_with_llm(
-                    transcript=normalized,
-                    chunks=chunks,
-                    slot_extracts=slot_extracts,
-                    required_search_report=required_report,
-                    profile=profile,
-                    rendering=rendering,
-                    llm=llm_provider,
-                    run_id=actual_run_id,
-                    source_file=str(source_path),
-                    extraction_meta=extraction_meta,
-                    model_info={"provider": llm_provider.name, "model": llm_config.get("model")},
-                )
-            if rendering.get("enable_critique", True):
-                try:
-                    draft_summary = critique_summary(draft_summary, normalized, llm_provider)
-                except LLMError as exc:
-                    draft_summary.setdefault("metadata", {})["critique"] = {
-                        "error": str(exc),
-                    }
-        except LLMError as exc:
-            # Fall back to deterministic synthesis but record why.
-            draft_summary = synthesize_summary(
+    emit("synthesize")
+    try:
+        if llm_summary_mode in {"fast", "direct", "direct_json", "one_pass"}:
+            draft_summary = synthesize_direct_with_llm(
                 transcript=normalized,
                 chunks=chunks,
-                chunk_analyses=analyses,
                 required_search_report=required_report,
                 profile=profile,
+                rendering=rendering,
+                llm=llm_provider,
                 run_id=actual_run_id,
                 source_file=str(source_path),
-                rendering=rendering,
+                chunk_analyses=analyses,
+                model_info={"provider": llm_provider.name, "model": llm_config.get("model")},
             )
-            draft_summary.setdefault("metadata", {})["llm_fallback_reason"] = str(exc)
-    else:
-        draft_summary = synthesize_summary(
-            transcript=normalized,
-            chunks=chunks,
-            chunk_analyses=analyses,
-            required_search_report=required_report,
-            profile=profile,
-            run_id=actual_run_id,
-            source_file=str(source_path),
-            rendering=rendering,
-        )
+        else:
+            slot_extracts, extraction_meta = extract_per_slot(
+                transcript=normalized,
+                chunks=chunks,
+                profile=profile,
+                llm=llm_provider,
+                single_pass_token_limit=int(rendering.get("single_pass_token_limit", 60_000)),
+                max_items_per_slot=int(rendering.get("max_items_per_slot", 8)),
+                meeting_id=str(normalized.get("meeting_id", actual_run_id)),
+            )
+            draft_summary = synthesize_with_llm(
+                transcript=normalized,
+                chunks=chunks,
+                slot_extracts=slot_extracts,
+                required_search_report=required_report,
+                profile=profile,
+                rendering=rendering,
+                llm=llm_provider,
+                run_id=actual_run_id,
+                source_file=str(source_path),
+                extraction_meta=extraction_meta,
+                model_info={"provider": llm_provider.name, "model": llm_config.get("model")},
+            )
+        if rendering.get("enable_critique", True):
+            emit("critique")
+            draft_summary = critique_summary(draft_summary, normalized, llm_provider)
+    except LLMError as exc:
+        raise LLMError("LLM synthesis failed: {0}".format(exc)) from exc
+    emit("verify")
     verification_report, final_summary = verify_summary(draft_summary)
     validate_final_summary(final_summary)
     public_summary = strip_evidence_fields(final_summary)
+    emit("render")
     markdown = render_summary_markdown(public_summary)
 
     write_json(paths["transcript"] / "raw_transcript.json", raw_transcript)
@@ -197,6 +185,7 @@ def process_transcript_source(
     write_json(final_summary_path, public_summary)
     write_text(markdown_path, markdown)
 
+    emit("done")
     return PipelineResult(
         run_id=actual_run_id,
         run_dir=paths["run"],
@@ -227,7 +216,10 @@ def _clean_summary_artifacts(summary_dir: Path, evidence_dir: Path) -> None:
 
 
 def _load_or_create_transcript(
-    source_path: Path, paths: Dict[str, Path], asr_config: Dict[str, Any]
+    source_path: Path,
+    paths: Dict[str, Path],
+    asr_config: Dict[str, Any],
+    on_stage: StageCallback = None,
 ) -> Dict[str, Any]:
     raw_transcript_path = paths["transcript"] / "raw_transcript.json"
     if raw_transcript_path.exists() and is_transcript_source(source_path):
@@ -241,10 +233,14 @@ def _load_or_create_transcript(
             cached = read_json(raw_transcript_path)
             if _cached_transcript_matches(cached, asr_config):
                 return cached
+        if on_stage is not None:
+            on_stage("audio")
         audio_path = extract_audio(source_path, paths["source"] / "audio.wav")
         provider = asr_config.get("provider", "openai_whisper")
         if provider != "openai_whisper":
             raise ValueError("unsupported ASR provider: {0}".format(provider))
+        if on_stage is not None:
+            on_stage("transcribe")
         return transcribe_audio(audio_path, source_path, asr_config)
 
     return load_source_transcript(source_path)

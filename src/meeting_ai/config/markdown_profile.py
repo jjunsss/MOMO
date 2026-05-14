@@ -13,6 +13,7 @@ from meeting_ai.config.defaults import (
     default_pipeline_config,
     default_user_profile,
 )
+from meeting_ai.config.runtime_overrides import apply_environment_overrides
 
 
 CHECKBOX_RE = re.compile(r"^-\s+\[(?P<checked>[xX ])\]\s+(?P<body>.+)$")
@@ -136,6 +137,7 @@ def load_markdown_profile(path: Path) -> Dict[str, Any]:
         models_config["llm"]["num_ctx"] = int(_number(settings["llm_num_ctx"], 32768))
     if settings.get("llm_api_key_env"):
         models_config["llm"]["api_key_env"] = settings["llm_api_key_env"]
+    apply_environment_overrides(profile, pipeline_config, models_config)
 
     automation = {
         "videos_dir": settings.get("videos_dir") or "videos",

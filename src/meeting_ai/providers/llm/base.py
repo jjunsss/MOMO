@@ -21,7 +21,8 @@ class LLMProvider(Protocol):
 
     Implementations must be deterministic given the same input + config so
     pipeline reruns are reproducible. ``call`` should raise :class:`LLMError`
-    on transport failures so the caller can decide whether to fall back.
+    on transport failures so the pipeline can fail loudly instead of silently
+    replacing the LLM with rule-based output.
     """
 
     name: str

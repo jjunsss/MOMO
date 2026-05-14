@@ -33,6 +33,11 @@ def _slot_definition_block(profile: Dict[str, Any]) -> str:
     return "\n".join(rows) if rows else "(없음)"
 
 
+def _custom_instruction_block(profile: Dict[str, Any]) -> str:
+    instruction = (profile.get("custom_instruction") or "").strip()
+    return instruction if instruction else "(없음)"
+
+
 def _custom_topics_block(profile: Dict[str, Any]) -> str:
     rows: List[str] = []
     for topic in profile.get("custom_topics", []):
@@ -58,6 +63,26 @@ def _verification_terms_block(profile: Dict[str, Any]) -> str:
 def _slot_titles(profile: Dict[str, Any]) -> str:
     titles = [item.get("label", "?") for item in profile.get("required_search_items", [])]
     return ", ".join(titles) if titles else "(없음)"
+
+
+def _prose_section_titles(output_language: str) -> Dict[str, str]:
+    if str(output_language).lower().startswith("en"):
+        return {
+            "section_tldr": "TL;DR",
+            "section_executive_summary": "Executive Summary",
+            "section_key_topics": "Key Discussion Flow",
+            "section_decisions_actions": "Decisions and Actions",
+            "section_next_meeting": "Next Meeting and Follow-ups",
+            "section_worth_noting": "Worth Noting",
+        }
+    return {
+        "section_tldr": "TL;DR",
+        "section_executive_summary": "핵심 요약",
+        "section_key_topics": "핵심 논의 흐름",
+        "section_decisions_actions": "결정과 액션",
+        "section_next_meeting": "다음 미팅과 후속 작업",
+        "section_worth_noting": "주의 깊게 봐야 할 맥락",
+    }
 
 
 def _slot_extracts_jsonl(slot_extracts: List[Dict[str, Any]]) -> str:
@@ -207,11 +232,13 @@ def synthesize_with_llm(
             "meeting_title": title,
             "meeting_duration": meeting_duration,
             "output_language": output_language,
+            "custom_instruction": _custom_instruction_block(profile),
             "slot_titles": _slot_titles(profile),
             "slot_definitions": _slot_definition_block(profile),
             "custom_topics": _custom_topics_block(profile),
             "verification_terms": _verification_terms_block(profile),
             "slot_extracts": slot_blob,
+            **_prose_section_titles(str(output_language)),
         },
     )
 
@@ -233,6 +260,7 @@ def synthesize_with_llm(
             "meeting_title": title,
             "meeting_duration": meeting_duration,
             "source_file": source_file,
+            "output_language": output_language,
             "prose_summary": prose_text,
             "slot_extracts": slot_blob,
             "verification_terms": _verification_terms_block(profile),

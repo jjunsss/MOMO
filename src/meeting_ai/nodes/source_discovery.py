@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 from meeting_ai.nodes.ingest import SUPPORTED_MEDIA_SUFFIXES
 

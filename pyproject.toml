@@ -6,14 +6,24 @@ build-backend = "setuptools.build_meta"
 name = "momo-meeting"
 version = "0.1.0"
 description = "Evidence-backed meeting recaps from long recordings"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
   "PyYAML>=5.4",
+  "requests>=2.31",
+]
+
+[project.optional-dependencies]
+asr = [
+  "openai-whisper>=20231117",
+]
+gui = [
+  "streamlit>=1.36",
 ]
 
 [project.scripts]
 momo = "meeting_ai.cli:main"
 meeting-ai = "meeting_ai.cli:main"
+momo-gui = "meeting_ai.app.launcher:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

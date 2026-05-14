@@ -25,6 +25,18 @@ def strip_evidence_fields(value: Any) -> Any:
     return _strip(deepcopy(value))
 
 
+def _section_enabled(summary: Dict[str, Any], section_id: str) -> bool:
+    """Mirror markdown.py's per-section toggle so evidence stays in sync."""
+    metadata = summary.get("metadata") or {}
+    sections = metadata.get("output_sections") or []
+    if not sections:
+        return True
+    for section in sections:
+        if isinstance(section, dict) and section.get("id") == section_id:
+            return bool(section.get("enabled", True))
+    return True
+
+
 def render_summary_evidence_markdown(
     summary: Dict[str, Any], transcript: Dict[str, Any]
 ) -> str:
@@ -64,14 +76,15 @@ def render_summary_evidence_markdown(
         "why_it_matters",
         transcript,
     )
-    _render_item_evidence(
-        lines,
-        "Open Questions",
-        summary.get("open_questions", []),
-        "question",
-        "context",
-        transcript,
-    )
+    if _section_enabled(summary, "open_questions"):
+        _render_item_evidence(
+            lines,
+            "Open Questions",
+            summary.get("open_questions", []),
+            "question",
+            "context",
+            transcript,
+        )
     _render_required_report_evidence(
         lines,
         "Required Search Report",

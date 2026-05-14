@@ -5,50 +5,120 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 
+SECTION_TITLES = {
+    "ko": {
+        "tldr": "TL;DR",
+        "executive_summary": "핵심 요약",
+        "key_topics": "핵심 논의",
+        "decisions": "결정사항",
+        "action_items": "Action Items",
+        "next_meeting": "다음 미팅 / Follow-up",
+        "worth_noting": "Worth Noting",
+        "open_questions": "Open Questions",
+        "required_search_report": "사용자 필수 탐색 항목 결과",
+        "appendix": "Appendix",
+    },
+    "en": {
+        "tldr": "TL;DR",
+        "executive_summary": "Executive Summary",
+        "key_topics": "Key Topics",
+        "decisions": "Decisions",
+        "action_items": "Action Items",
+        "next_meeting": "Next Meeting / Follow-up",
+        "worth_noting": "Worth Noting",
+        "open_questions": "Open Questions",
+        "required_search_report": "Required Search Results",
+        "appendix": "Appendix",
+    },
+}
+
+LABELS = {
+    "ko": {
+        "date": "날짜",
+        "source": "원본",
+        "duration": "길이",
+        "pipeline": "파이프라인",
+        "no_key_topics": "명확한 핵심 논의가 감지되지 않았습니다.",
+        "key_topic_headers": ["주제", "요약", "왜 중요한가"],
+        "no_decisions": "명시적으로 확인된 결정사항은 없습니다.",
+        "decision_headers": ["결정", "맥락"],
+        "no_actions": "명시적으로 확인된 액션아이템은 없습니다.",
+        "owner": "담당",
+        "deadline": "마감",
+        "no_next_meeting": "다음 미팅 일정이나 agenda는 명시적으로 언급되지 않았습니다.",
+        "next_meeting_headers": ["상태", "날짜", "시간", "Agenda"],
+        "no_worth_noting": "별도 보존할 만한 맥락은 감지되지 않았습니다.",
+        "no_questions": "열린 질문은 감지되지 않았습니다.",
+        "required_headers": ["항목", "상태", "요약"],
+    },
+    "en": {
+        "date": "Date",
+        "source": "Source",
+        "duration": "Duration",
+        "pipeline": "Pipeline",
+        "no_key_topics": "No clear key topics were detected.",
+        "key_topic_headers": ["Topic", "Summary", "Why it matters"],
+        "no_decisions": "No explicit decisions were identified.",
+        "decision_headers": ["Decision", "Context"],
+        "no_actions": "No explicit action items were identified.",
+        "owner": "owner",
+        "deadline": "deadline",
+        "no_next_meeting": "No next meeting schedule or agenda was explicitly mentioned.",
+        "next_meeting_headers": ["Status", "Date", "Time", "Agenda"],
+        "no_worth_noting": "No additional worth-noting context was detected.",
+        "no_questions": "No open questions were detected.",
+        "required_headers": ["Item", "Status", "Summary"],
+    },
+}
+
+
 def render_summary_markdown(summary: Dict[str, Any]) -> str:
     lines: List[str] = []
     metadata = summary.get("metadata", {})
     rendering = metadata.get("rendering", {}) or {}
+    lang = _language(metadata)
+    labels = LABELS[lang]
     show_skipped_stats = bool(rendering.get("include_skipped_chunk_stats", True))
 
     lines.append("# {0}".format(summary.get("title", "Meeting Summary")))
     lines.append("")
-    lines.append("- **Date**: {0}".format(summary.get("date", "unknown")))
-    lines.append("- **Source**: {0}".format(summary.get("source_file", "unknown")))
-    lines.append("- **Duration**: {0}".format(summary.get("duration", "unknown")))
-    lines.append("- **Pipeline**: {0}".format(metadata.get("pipeline_version", "unknown")))
+    lines.append("- **{0}**: {1}".format(labels["date"], summary.get("date", "unknown")))
+    lines.append("- **{0}**: {1}".format(labels["source"], summary.get("source_file", "unknown")))
+    lines.append("- **{0}**: {1}".format(labels["duration"], summary.get("duration", "unknown")))
+    lines.append("- **{0}**: {1}".format(labels["pipeline"], metadata.get("pipeline_version", "unknown")))
     lines.append("")
 
     if _enabled(metadata, "tldr"):
-        _section(lines, _title(metadata, "tldr", "TL;DR"))
+        _section(lines, _title(metadata, "tldr", lang))
         lines.append(summary.get("tldr", ""))
         lines.append("")
 
     if _enabled(metadata, "executive_summary"):
-        _section(lines, _title(metadata, "executive_summary", "핵심 요약"))
+        _section(lines, _title(metadata, "executive_summary", lang))
         lines.append(summary.get("executive_summary", ""))
         lines.append("")
 
     if _enabled(metadata, "key_topics"):
-        _render_key_topics(lines, summary.get("key_topics", []), _title(metadata, "key_topics", "핵심 논의"))
+        _render_key_topics(lines, summary.get("key_topics", []), _title(metadata, "key_topics", lang), labels)
     if _enabled(metadata, "decisions"):
-        _render_decisions(lines, summary.get("decisions", []), _title(metadata, "decisions", "결정사항"))
+        _render_decisions(lines, summary.get("decisions", []), _title(metadata, "decisions", lang), labels)
     if _enabled(metadata, "action_items"):
-        _render_actions(lines, summary.get("action_items", []), _title(metadata, "action_items", "Action Items"))
+        _render_actions(lines, summary.get("action_items", []), _title(metadata, "action_items", lang), labels)
     if _enabled(metadata, "next_meeting"):
-        _render_next_meeting(lines, summary.get("next_meeting", {}), _title(metadata, "next_meeting", "다음 미팅 / Follow-up"))
+        _render_next_meeting(lines, summary.get("next_meeting", {}), _title(metadata, "next_meeting", lang), labels)
     if _enabled(metadata, "worth_noting"):
-        _render_worth_noting(lines, summary.get("worth_noting", []), _title(metadata, "worth_noting", "Worth Noting"))
+        _render_worth_noting(lines, summary.get("worth_noting", []), _title(metadata, "worth_noting", lang), labels)
     if _enabled(metadata, "open_questions"):
-        _render_questions(lines, summary.get("open_questions", []), _title(metadata, "open_questions", "Open Questions"))
+        _render_questions(lines, summary.get("open_questions", []), _title(metadata, "open_questions", lang), labels)
     if _enabled(metadata, "required_search_report"):
         _render_required_report(
             lines,
             summary.get("required_search_report", []),
-            _title(metadata, "required_search_report", "사용자 필수 탐색 항목 결과"),
+            _title(metadata, "required_search_report", lang),
+            labels,
         )
     if _enabled(metadata, "appendix"):
-        _render_appendix(lines, metadata, _title(metadata, "appendix", "Appendix"), show_skipped_stats)
+        _render_appendix(lines, metadata, _title(metadata, "appendix", lang), show_skipped_stats)
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -57,14 +127,19 @@ def _section(lines: List[str], title: str) -> None:
     lines.append("")
 
 
-def _render_key_topics(lines: List[str], topics: List[Dict[str, Any]], title: str) -> None:
+def _render_key_topics(
+    lines: List[str],
+    topics: List[Dict[str, Any]],
+    title: str,
+    labels: Dict[str, Any],
+) -> None:
     _section(lines, title)
     if not topics:
-        lines.append("명확한 핵심 논의가 감지되지 않았습니다.")
+        lines.append(labels["no_key_topics"])
         lines.append("")
         return
-    lines.append("| 주제 | 요약 | 왜 중요한가 |")
-    lines.append("|---|---|---|")
+    headers = labels["key_topic_headers"]
+    _table_header(lines, headers)
     for topic in topics:
         lines.append(
             "| {0} | {1} | {2} |".format(
@@ -76,14 +151,18 @@ def _render_key_topics(lines: List[str], topics: List[Dict[str, Any]], title: st
     lines.append("")
 
 
-def _render_decisions(lines: List[str], decisions: List[Dict[str, Any]], title: str) -> None:
+def _render_decisions(
+    lines: List[str],
+    decisions: List[Dict[str, Any]],
+    title: str,
+    labels: Dict[str, Any],
+) -> None:
     _section(lines, title)
     if not decisions:
-        lines.append("명시적으로 확인된 결정사항은 없습니다.")
+        lines.append(labels["no_decisions"])
         lines.append("")
         return
-    lines.append("| 결정 | 맥락 |")
-    lines.append("|---|---|")
+    _table_header(lines, labels["decision_headers"])
     for item in decisions:
         lines.append(
             "| {0} | {1} |".format(
@@ -95,11 +174,14 @@ def _render_decisions(lines: List[str], decisions: List[Dict[str, Any]], title: 
 
 
 def _render_actions(
-    lines: List[str], actions: List[Dict[str, Any]], title: str
+    lines: List[str],
+    actions: List[Dict[str, Any]],
+    title: str,
+    labels: Dict[str, Any],
 ) -> None:
     _section(lines, title)
     if not actions:
-        lines.append("명시적으로 확인된 액션아이템은 없습니다.")
+        lines.append(labels["no_actions"])
         lines.append("")
         return
     for item in actions:
@@ -107,24 +189,26 @@ def _render_actions(
         owner = _known_text(item.get("owner"))
         deadline = _known_text(item.get("deadline"))
         if owner:
-            suffix_parts.append("owner: {0}".format(owner))
+            suffix_parts.append("{0}: {1}".format(labels["owner"], owner))
         if deadline:
-            suffix_parts.append("deadline: {0}".format(deadline))
+            suffix_parts.append("{0}: {1}".format(labels["deadline"], deadline))
         suffix = " ({0})".format(", ".join(suffix_parts)) if suffix_parts else ""
         lines.append("- [ ] {0}{1}".format(item.get("task", ""), suffix))
     lines.append("")
 
 
 def _render_next_meeting(
-    lines: List[str], next_meeting: Dict[str, Any], title: str
+    lines: List[str],
+    next_meeting: Dict[str, Any],
+    title: str,
+    labels: Dict[str, Any],
 ) -> None:
     _section(lines, title)
     if next_meeting.get("status") != "found":
-        lines.append("다음 미팅 일정이나 agenda는 명시적으로 언급되지 않았습니다.")
+        lines.append(labels["no_next_meeting"])
         lines.append("")
         return
-    lines.append("| 상태 | 날짜 | 시간 | Agenda |")
-    lines.append("|---|---|---|---|")
+    _table_header(lines, labels["next_meeting_headers"])
     lines.append(
         "| {0} | {1} | {2} | {3} |".format(
             _cell(next_meeting.get("status", "")),
@@ -136,10 +220,15 @@ def _render_next_meeting(
     lines.append("")
 
 
-def _render_worth_noting(lines: List[str], notes: List[Dict[str, Any]], title: str) -> None:
+def _render_worth_noting(
+    lines: List[str],
+    notes: List[Dict[str, Any]],
+    title: str,
+    labels: Dict[str, Any],
+) -> None:
     _section(lines, title)
     if not notes:
-        lines.append("별도 보존할 만한 맥락은 감지되지 않았습니다.")
+        lines.append(labels["no_worth_noting"])
         lines.append("")
         return
     for item in notes:
@@ -152,10 +241,15 @@ def _render_worth_noting(lines: List[str], notes: List[Dict[str, Any]], title: s
     lines.append("")
 
 
-def _render_questions(lines: List[str], questions: List[Dict[str, Any]], title: str) -> None:
+def _render_questions(
+    lines: List[str],
+    questions: List[Dict[str, Any]],
+    title: str,
+    labels: Dict[str, Any],
+) -> None:
     _section(lines, title)
     if not questions:
-        lines.append("열린 질문은 감지되지 않았습니다.")
+        lines.append(labels["no_questions"])
         lines.append("")
         return
     for item in questions:
@@ -167,11 +261,11 @@ def _render_required_report(
     lines: List[str],
     report: List[Dict[str, Any]],
     title: str,
+    labels: Dict[str, Any],
 ) -> None:
     _section(lines, title)
-    headers = ["항목", "상태", "요약"]
-    lines.append("| " + " | ".join(headers) + " |")
-    lines.append("|" + "|".join("---" for _ in headers) + "|")
+    headers = labels["required_headers"]
+    _table_header(lines, headers)
     for item in report:
         cells = [
             _cell(item.get("label", "")),
@@ -196,6 +290,11 @@ def _cell(value: str) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ").strip()
 
 
+def _table_header(lines: List[str], headers: List[str]) -> None:
+    lines.append("| " + " | ".join(headers) + " |")
+    lines.append("|" + "|".join("---" for _ in headers) + "|")
+
+
 def _known_text(value: Any) -> str:
     text = str(value or "").strip()
     if text.lower() in {"", "unknown", "none", "null", "n/a", "na", "-"}:
@@ -215,8 +314,16 @@ def _enabled(metadata: Dict[str, Any], section_id: str) -> bool:
     return True
 
 
-def _title(metadata: Dict[str, Any], section_id: str, fallback: str) -> str:
+def _language(metadata: Dict[str, Any]) -> str:
+    rendering = metadata.get("rendering") or {}
+    value = str(rendering.get("output_language") or "ko").lower().strip()
+    return "en" if value.startswith("en") else "ko"
+
+
+def _title(metadata: Dict[str, Any], section_id: str, lang: str) -> str:
+    if lang == "en":
+        return SECTION_TITLES["en"].get(section_id, section_id.replace("_", " ").title())
     for section in metadata.get("output_sections") or []:
         if section.get("id") == section_id and section.get("title"):
             return str(section["title"])
-    return fallback
+    return SECTION_TITLES["ko"].get(section_id, section_id)

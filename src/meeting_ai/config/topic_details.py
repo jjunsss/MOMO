@@ -63,6 +63,16 @@ def apply_topic_details(loaded: Dict[str, Any], path: Optional[Path]) -> Dict[st
     if required_items is not None:
         profile["required_search_items"] = _normalize_required_items(required_items)
 
+    instruction = details.get("custom_instruction")
+    if instruction is None:
+        instruction = details.get("instruction")
+    if instruction is None:
+        instruction = details.get("notes")
+    if instruction is not None:
+        text = str(instruction).strip()
+        if text:
+            profile["custom_instruction"] = text
+
     profile["topic_details"] = {"path": str(path), "loaded": True}
     return merged
 

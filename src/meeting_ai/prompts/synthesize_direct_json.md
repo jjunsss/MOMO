@@ -23,6 +23,7 @@
 8. worth_noting은 정말 후속 판단에 중요한 것만 최대 {{ worth_noting_max }}개.
 9. key_topics는 최대 {{ key_topics_max }}개.
 10. 단순 시간순 정렬 금지. "무엇이 논점이었고, 왜 중요한지, 어떤 후속 판단을 만든 것인지"를 압축합니다.
+11. 언어 처리: 모든 자연어 JSON 필드는 `output_language`(={{ output_language }})로 작성합니다. `output_language`가 `en` 또는 `English`이면 영어로, `ko` 또는 `Korean`이면 한국어로 작성합니다. 다만 transcript에 등장한 기술 용어·영어 약어·코드 이름·논문/모델/라이브러리/사람 이름·고유명사는 **원문 표기 그대로 보존**합니다 (예: "3D Gaussian", "SDS", "SMPL-X", "Whisper", "Ollama", "Qwen"). 한국어 안에 영어 단어가 자연스럽게 섞이는 것은 정상이며, 인위적으로 한국어로 번역하지 않습니다. 영어 출력일 때도 한국어 고유명사·약어는 그대로 둡니다.
 
 # 회의 메타
 - meeting_id: {{ meeting_id }}
@@ -30,6 +31,10 @@
 - source_file: {{ source_file }}
 - duration: {{ meeting_duration }}
 - output_language: {{ output_language }}
+
+# 사용자 추가 지시 (이 회의를 어떤 관점으로 정리할지)
+> 가장 우선합니다. 명시적이면 그대로 따르고, 충돌 시 아래 항목보다 이 지시를 따릅니다.
+{{ custom_instruction }}
 
 # 사용자가 반드시 찾으려는 항목
 {{ required_items }}

@@ -12,15 +12,14 @@ asr:
   diarization: false
 
 llm:
-  provider: deterministic_mvp
-  model: rule_based
+  provider: ollama
+  model: qwen3.5:9b
+  base_url: http://localhost:11434
+  request_timeout_seconds: 1800
+  num_ctx: 65536
   temperature: 0.0
   structured_outputs: true
 
 embedding:
   provider: none
   model: none
-
-fallbacks:
-  allow_cloud_llm: false
-  allow_cloud_asr: false

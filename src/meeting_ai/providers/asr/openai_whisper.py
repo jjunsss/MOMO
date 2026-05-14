@@ -16,11 +16,8 @@ def transcribe_audio(audio_path: Path, source_path: Path, asr_config: Dict[str, 
         ) from exc
 
     model_name = str(asr_config.get("model", "small"))
-    configured_device = str(asr_config.get("device", "auto"))
-    if configured_device == "auto":
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-    else:
-        device = configured_device
+    configured_device = str(asr_config.get("device", "cuda"))
+    device = _resolve_cuda_device(configured_device, torch.cuda.is_available())
 
     language = _language_value(asr_config.get("language", "auto"))
     fp16 = bool(asr_config.get("fp16", device == "cuda")) and device == "cuda"
@@ -52,7 +49,7 @@ def transcribe_audio(audio_path: Path, source_path: Path, asr_config: Dict[str, 
         )
 
     duration = segments[-1]["end"] if segments else 0.0
-    return {
+    transcript = {
         "meeting_id": source_path.stem,
         "title": source_path.stem,
         "source_file": str(source_path),
@@ -67,6 +64,10 @@ def transcribe_audio(audio_path: Path, source_path: Path, asr_config: Dict[str, 
             "decode_options": decode_options,
         },
     }
+    del model
+    if device == "cuda":
+        torch.cuda.empty_cache()
+    return transcript
 
 
 def _language_value(value: Any) -> Optional[str]:
@@ -87,6 +88,28 @@ def _decode_options(asr_config: Dict[str, Any]) -> Dict[str, Any]:
             asr_config.get("compression_ratio_threshold", 2.4)
         ),
     }
+
+
+def _resolve_cuda_device(configured_device: str, cuda_available: bool) -> str:
+    device = (configured_device or "cuda").strip().lower()
+    if device == "auto":
+        if cuda_available:
+            return "cuda"
+        raise RuntimeError(
+            "ASR requires CUDA, but torch cannot see a CUDA device. "
+            "MOMO does not fall back to CPU transcription."
+        )
+    if not device.startswith("cuda"):
+        raise RuntimeError(
+            "ASR device is configured as '{0}', but MOMO requires CUDA.".format(
+                configured_device
+            )
+        )
+    if not cuda_available:
+        raise RuntimeError(
+            "ASR is configured to use CUDA, but torch cannot see a CUDA device."
+        )
+    return device
 
 
 def _bool_config(value: Any) -> bool:

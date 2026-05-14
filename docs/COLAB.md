@@ -41,7 +41,9 @@ The Colab notebook uses trial-stable defaults:
 - Korean output by default
 
 For a slower quality pass, change these notebook variables before
-running the pipeline cell:
+running the pipeline cell. This can take 10+ minutes depending on the
+recording length and the Colab GPU, but usually gives better ASR and
+more careful summary structure:
 
 ```python
 ASR_MODEL = "large-v3"

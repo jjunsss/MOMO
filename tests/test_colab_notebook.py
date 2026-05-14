@@ -21,6 +21,8 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn("Run each cell one by one from top to bottom", source)
         self.assertIn("GPU 확인", source)
         self.assertIn("GPU check", source)
+        self.assertIn("10분 이상 걸려도 더 좋은 품질", source)
+        self.assertIn("For higher quality, if a 10+ minute", source)
         self.assertIn("torch.cuda.is_available", source)
         self.assertIn('ASR_MODEL = "medium"', source)
         self.assertIn('LLM_NUM_CTX = "8192"', source)

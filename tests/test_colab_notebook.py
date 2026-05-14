@@ -21,6 +21,9 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn("Run each cell one by one from top to bottom", source)
         self.assertIn("GPU 확인", source)
         self.assertIn("GPU check", source)
+        self.assertIn("Visual guide / 화면 안내", source)
+        self.assertIn("colab-01-runtime-menu.svg", source)
+        self.assertIn("colab-04-run-cells-upload.svg", source)
         self.assertIn("10분 이상 걸려도 더 좋은 품질", source)
         self.assertIn("For higher quality, if a 10+ minute", source)
         self.assertIn("torch.cuda.is_available", source)
@@ -33,6 +36,19 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn("ollama\", \"pull", source)
         self.assertIn("meeting_ai.cli", source)
         self.assertIn("files.upload", source)
+
+    def test_colab_visual_guide_assets_are_documented(self) -> None:
+        guide = Path("docs/COLAB.md").read_text(encoding="utf-8")
+        for filename in [
+            "colab-01-runtime-menu.svg",
+            "colab-02-change-runtime-type.svg",
+            "colab-03-select-gpu-save.svg",
+            "colab-04-run-cells-upload.svg",
+        ]:
+            self.assertIn(filename, guide)
+            path = Path("docs/screenshots") / filename
+            self.assertTrue(path.exists())
+            self.assertIn("<svg", path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

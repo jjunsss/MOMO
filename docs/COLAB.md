@@ -28,6 +28,32 @@ The notebook fails early when `torch.cuda.is_available()` is false.
 MOMO also configures Whisper with `MOMO_ASR_DEVICE=cuda`, so it does
 not silently fall back to CPU transcription.
 
+## Beginner visual guide
+
+If the Colab menu looks slightly different, look for the same words:
+**Runtime**, **Change runtime type**, **Hardware accelerator**, **GPU**,
+and **Save**.
+
+**한국어**: 초보자는 아래 이미지를 보면서 그대로 따라가면 됩니다.
+
+**English**: Beginners can follow the screenshots below step by step.
+
+### 1. Open the Runtime menu
+
+![Open Runtime menu](screenshots/colab-01-runtime-menu.svg)
+
+### 2. Choose Change runtime type
+
+![Choose Change runtime type](screenshots/colab-02-change-runtime-type.svg)
+
+### 3. Select GPU and Save
+
+![Select GPU and Save](screenshots/colab-03-select-gpu-save.svg)
+
+### 4. Run cells and upload one recording
+
+![Run cells and upload recording](screenshots/colab-04-run-cells-upload.svg)
+
 ## Defaults
 
 The Colab notebook uses trial-stable defaults:

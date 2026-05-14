@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Colab step 2: choose Change runtime type</title>
+  <desc id="desc">A screenshot-style guide showing Change runtime type highlighted in the Runtime menu.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <rect x="54" y="46" width="1092" height="636" rx="18" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="54" y="46" width="1092" height="54" rx="18" fill="#eef2f7"/>
+  <circle cx="86" cy="73" r="8" fill="#ef4444"/>
+  <circle cx="112" cy="73" r="8" fill="#f59e0b"/>
+  <circle cx="138" cy="73" r="8" fill="#22c55e"/>
+  <rect x="176" y="58" width="720" height="30" rx="15" fill="#ffffff" stroke="#dbe3ef"/>
+  <text x="198" y="78" font-family="Arial, Noto Sans KR, sans-serif" font-size="15" fill="#475569">MOMO_Colab.ipynb</text>
+  <text x="104" y="159" font-family="Arial, Noto Sans KR, sans-serif" font-size="28" font-weight="700" fill="#f59e0b">MOMO Colab Quick Trial</text>
+  <text x="104" y="210" font-family="Arial, Noto Sans KR, sans-serif" font-size="16" fill="#64748b">File</text>
+  <text x="158" y="210" font-family="Arial, Noto Sans KR, sans-serif" font-size="16" fill="#64748b">Edit</text>
+  <text x="213" y="210" font-family="Arial, Noto Sans KR, sans-serif" font-size="16" fill="#64748b">View</text>
+  <text x="274" y="210" font-family="Arial, Noto Sans KR, sans-serif" font-size="16" fill="#64748b">Insert</text>
+  <rect x="341" y="188" width="92" height="34" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="3"/>
+  <text x="357" y="210" font-family="Arial, Noto Sans KR, sans-serif" font-size="16" font-weight="700" fill="#92400e">Runtime</text>
+  <text x="453" y="210" font-family="Arial, Noto Sans KR, sans-serif" font-size="16" fill="#64748b">Tools</text>
+  <rect x="330" y="226" width="280" height="300" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+  <text x="358" y="270" font-family="Arial, Noto Sans KR, sans-serif" font-size="17" fill="#334155">Run all</text>
+  <text x="358" y="314" font-family="Arial, Noto Sans KR, sans-serif" font-size="17" fill="#334155">Interrupt execution</text>
+  <text x="358" y="358" font-family="Arial, Noto Sans KR, sans-serif" font-size="17" fill="#334155">Restart runtime</text>
+  <rect x="346" y="385" width="248" height="48" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+  <text x="358" y="416" font-family="Arial, Noto Sans KR, sans-serif" font-size="17" font-weight="700" fill="#1d4ed8">Change runtime type</text>
+  <text x="358" y="468" font-family="Arial, Noto Sans KR, sans-serif" font-size="17" fill="#334155">Factory reset runtime</text>
+  <path d="M815 408 C742 412 674 414 600 412" fill="none" stroke="#2563eb" stroke-width="6" marker-end="url(#arrow)"/>
+  <rect x="760" y="250" width="356" height="160" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="792" y="294" font-family="Arial, Noto Sans KR, sans-serif" font-size="25" font-weight="700" fill="#1d4ed8">2. Change runtime type</text>
+  <text x="792" y="332" font-family="Arial, Noto Sans KR, sans-serif" font-size="20" fill="#1e3a8a">메뉴에서 이 항목을 선택하세요.</text>
+  <text x="792" y="370" font-family="Arial, Noto Sans KR, sans-serif" font-size="17" fill="#475569">Choose this item from the menu.</text>
+</svg>

@@ -51,7 +51,7 @@ artifacts as the local CLI. Use it as the lightweight evaluation path.
 For confidential meetings or regular production use, run the local/server
 GUI so files and model caches stay on your own machine.
 
-> Colab walkthrough → [docs/COLAB.md](docs/COLAB.md)
+> Colab beginner screenshots → [docs/COLAB.md#beginner-visual-guide](docs/COLAB.md#beginner-visual-guide)
 
 ## Local/server requirements
 

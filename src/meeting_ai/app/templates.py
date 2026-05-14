@@ -87,6 +87,7 @@ TEMPLATES: Tuple[Template, ...] = (
                 "잠정 결정과 확정 결정을 구분한다",
                 "담당자가 명시된 작업과 미정인 작업을 구분한다",
                 "날짜와 시간을 혼동하지 않는다",
+                "기술명·논문명은 영어 원문 표기를 우선한다",
             ],
             [
                 "Distinguish tentative vs. confirmed decisions",

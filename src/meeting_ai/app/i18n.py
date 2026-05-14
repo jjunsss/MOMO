@@ -200,13 +200,17 @@ _STRINGS: Dict[str, Dict[Language, str]] = {
         "en": "⚠️ Things the AI should not confuse",
     },
     "guide.must_check_help": {
-        "ko": "한 줄에 하나. 헷갈리기 쉬운 항목을 미리 알려두면 더 정확하게 정리합니다.",
+        "ko": (
+            "한 줄에 하나. 헷갈리기 쉬운 항목을 미리 알려두면 더 정확하게 정리합니다. "
+            "기술명·논문명처럼 보통 영어로 말하는 단어는 영어 원문 표기로 적어주세요."
+        ),
         "en": "One per line. Telling the AI in advance prevents common confusions.",
     },
     "guide.must_check_placeholder": {
         "ko": (
             "잠정 결정과 확정 결정을 구분한다\n"
-            "날짜와 시간을 헷갈리지 않는다"
+            "날짜와 시간을 헷갈리지 않는다\n"
+            "기술명·논문명은 영어 원문 표기를 우선한다 (예: Chain-of-Thought, Gaussian Splatting)"
         ),
         "en": (
             "Distinguish tentative vs. confirmed decisions\n"

@@ -84,6 +84,23 @@ The output language is controlled by:
 OUTPUT_LANGUAGE = "ko"  # or "en"
 ```
 
+## Meeting focus
+
+The **Meeting focus / 회의 요약 조건** cell is where beginners should
+edit meeting-specific guidance. You can keep the defaults for a simple
+trial, but changing this cell usually improves the summary.
+
+**한국어**: 코드를 몰라도 따옴표 안의 글자만 바꾸면 됩니다. 가장
+중요한 항목은 `custom_instruction`입니다.
+
+| Field | What to edit |
+|---|---|
+| `title` | Meeting title shown in the output. |
+| `custom_instruction` | Most important. One or two sentences about what MOMO should prioritize. |
+| `topics` | Topics MOMO should actively look for. |
+| `must_check` | Caution rules, such as not inventing dates or preserving English technical names. |
+| `output_language` | Output language inherited from `OUTPUT_LANGUAGE`. |
+
 ## Outputs
 
 The final cell displays

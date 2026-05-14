@@ -26,6 +26,8 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn("colab-04-run-cells-upload.svg", source)
         self.assertIn("10분 이상 걸려도 더 좋은 품질", source)
         self.assertIn("For higher quality, if a 10+ minute", source)
+        self.assertIn("따옴표 안의 글자만 바꾸면 됩니다", source)
+        self.assertIn("The most important field is `custom_instruction`", source)
         self.assertIn("torch.cuda.is_available", source)
         self.assertIn('ASR_MODEL = "medium"', source)
         self.assertIn('LLM_NUM_CTX = "8192"', source)
@@ -40,6 +42,15 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn('ollama_cmd, "pull"', source)
         self.assertIn("meeting_ai.cli", source)
         self.assertIn("files.upload", source)
+
+    def test_colab_docs_explain_meeting_focus_fields(self) -> None:
+        guide = Path("docs/COLAB.md").read_text(encoding="utf-8")
+
+        self.assertIn("## Meeting focus", guide)
+        self.assertIn("custom_instruction", guide)
+        self.assertIn("Most important", guide)
+        self.assertIn("must_check", guide)
+        self.assertIn("English technical names", guide)
 
     def test_colab_visual_guide_assets_are_documented(self) -> None:
         guide = Path("docs/COLAB.md").read_text(encoding="utf-8")

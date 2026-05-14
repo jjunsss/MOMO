@@ -1,0 +1,11 @@
+[server]
+# 회의 영상 1~4 GB까지 업로드할 수 있도록 한도를 올립니다.
+maxUploadSize = 4096
+maxMessageSize = 4096
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#2563eb"

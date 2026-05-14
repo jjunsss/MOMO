@@ -1,19 +1,12 @@
 # MOMO
 
-MOMO turns long Zoom recordings into Markdown meeting recaps. Drop a recording
-into `videos/`, add the few things you care about to `topic_details.json`, and
-get a summary plus a separate evidence file.
+MOMO turns long Zoom recordings into Markdown meeting recaps with
+evidence-anchored timestamps. Drop a file, write a few lines about
+what you want, click start. Everything runs locally on your GPU.
 
-## The Pipeline
+![home page](docs/screenshots/01-home.png)
 
-Four stages, each with one job:
-
-| Stage | Component | Role |
-|---|---|---|
-| **Speech → Text** | OpenAI Whisper `large-v3` (local, GPU) | the recording becomes a Korean transcript with per-segment timestamps |
-| **Filter** | rule-based chunk salience (no LLM) | each 6–10 min chunk is marked *kept* or *skipped* before any LLM sees it |
-| **Recap** | Qwen 3.5 9B via Ollama *(or any powerful LLM you can use)* | reads the kept chunks and produces the meeting summary |
-| **Render** | deterministic Markdown renderer (no LLM) | turns the validated JSON into the public recap and the evidence file |
+## What it does
 
 ```text
 videos/meeting.mp4
@@ -37,173 +30,144 @@ slot_extracts.jsonl
         ▼   LLM: 2-pass summary write  (prose → strict JSON)
 final_summary.draft.json
         │
-        ▼   LLM: CoVe critique  (evidence-anchored verification)
+        ▼   LLM: CoVe-style critique  (evidence-anchored verification)
 final_summary.json ── deterministic render ──▶ final_summary.md
                                                 + summary_evidence.md
 ```
 
-Defaults assume a 16 GB local GPU (RTX 4080-class): Whisper `large-v3` for
-transcription, Qwen 3.5 9B with thinking for the recap. Swap any stage in
-`meeting_profile.md`.
+> Stage table, output artifacts, defaults → [docs/PIPELINE.md](docs/PIPELINE.md)
 
-## Example
+## Requirements
 
-Real MOMO output from a 52-second CC-BY Korean clip:
-[`examples/demo_korean_speech/`](examples/demo_korean_speech/)
+Before installing, the server only needs:
 
-- [`final_summary.md`](examples/demo_korean_speech/final_summary.md) — the recap
-- [`summary_evidence.md`](examples/demo_korean_speech/summary_evidence.md) — every claim with its transcript line and timestamp
-- [`normalized_transcript.md`](examples/demo_korean_speech/normalized_transcript.md) — the full Whisper transcript
-- [`SOURCE.md`](examples/demo_korean_speech/SOURCE.md) — source attribution + reproduce command
+- **Linux**
+- **NVIDIA GPU + working NVIDIA driver**
+- `nvidia-smi` must run successfully
 
-End-to-end on RTX 4080: ~70 seconds.
+The shell installer handles the rest when possible:
 
-## Quick Start
+- `.venv`
+- Python 3.10+ (uses existing Python, or installs user-local Python with `uv`)
+- `curl`, `ffmpeg`, `python3-venv`, `pip`
+- PyTorch CUDA wheels
+- Whisper, Streamlit, Ollama, and the default LLM model
 
-### 1. Create a Conda environment
+Supported system package managers: `apt`, `dnf`, `yum`, `pacman`,
+`zypper`, and `apk`. The script may ask for `sudo`.
 
-Conda handles `ffmpeg`, CUDA, and PyTorch with less friction than `venv`,
-especially on GPU machines.
+MOMO does **not** install NVIDIA drivers. Check the GPU first:
 
 ```bash
-# Recent conda (≥ 26.x) requires accepting Terms of Service once.
-# Skip these two lines if you've already accepted them.
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
-
-conda create -n momo python=3.10 -y
-conda activate momo
-python -m pip install --upgrade pip setuptools wheel
+nvidia-smi
 ```
 
-`venv` works too if you already have ffmpeg + CUDA set up.
+Docker users also need Docker Compose v2 and NVIDIA Container Toolkit.
 
-### 2. Install ffmpeg
-
-With Conda:
+## Quick start
 
 ```bash
-conda install -c conda-forge ffmpeg -y
-```
-
-Or use your system package manager:
-
-```bash
-sudo apt-get update
-sudo apt-get install -y ffmpeg
-```
-
-### 3. Install PyTorch
-
-For CUDA 12.1:
-
-```bash
-conda install pytorch torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y
-```
-
-CPU-only? Use the command from the official PyTorch installer page.
-
-### 4. Get the source and install MOMO
-
-```bash
-conda install -c conda-forge git -y    # skip if git is already on PATH
 git clone https://github.com/jjunsss/MOMO.git
 cd MOMO
-python -m pip install openai-whisper PyYAML
-python -m pip install -e .
+scripts/start-gui.sh
 ```
 
-### 5. Install the local LLM
+Open the URL printed by the script, usually **<http://localhost:8501>**.
+If `8501` is busy, MOMO automatically tries `8502` through `8510`.
+First run downloads a few GB of models; **every later launch is the
+same command** and skips the install in seconds.
 
-Install Ollama and pull a model that fits your GPU.
+> Other ways to install → [docs/INSTALL.md](docs/INSTALL.md)
 
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama serve
-ollama pull qwen3.5:9b
-```
+## How to use
 
-Then set the model in `meeting_profile.md`:
+The interface speaks **Korean and English** (toggle in the sidebar).
+Three steps.
 
-```text
-llm_provider: ollama
-llm_model: qwen3.5:9b
-llm_base_url: http://localhost:11434
-```
+### Step 1 — Drop a recording
 
-## How To Use
+Upload an `.mp4 / .mkv / .mov / .m4a / .mp3 / .wav` (up to 4 GB), or
+pick an existing file from `videos/` in the second tab. The sidebar
+lists past runs so you can re-open them without re-running.
 
-### 1. Put a recording in `videos/`
+### Step 2 — Tell the AI what to focus on (this is the important part)
 
-```text
-videos/
-  Screen_Recording_20260429_172841_Zoom.mp4
-```
+![summary guide section](docs/screenshots/02-summary-guide.png)
 
-The newest media file is picked automatically.
+The bordered panel is where you steer the summary. All four fields are
+optional — the free-form instruction has the biggest impact on quality:
 
-### 2. Edit `topic_details.json`
+| Field | What it does |
+|---|---|
+| 🗣️ **Free-form instruction** | One or two sentences in your own words. Goes directly into the LLM prompt. |
+| 📝 **Meeting title** | Cosmetic label for the report. |
+| ⭐ **Topics** | One per line. The AI looks for these and structures the summary around them. |
+| ⚠️ **Confusion watch** | One per line. Things the AI must not mix up. |
 
-Plain strings are enough.
+Don't know what to write? Pick a meeting-type preset and edit:
 
-```json
-{
-  "title": "Research Meeting",
-  "topics": [
-    "main experiment result",
-    "demo direction",
-    "next meeting"
-  ],
-  "must_check": [
-    "do not confuse dates and times",
-    "separate visual features from text embeddings"
-  ]
-}
-```
+![template applied](docs/screenshots/03-template-applied.png)
 
-### 3. Run
+Three presets: **📚 Research**, **👥 1:1**, **🤝 External meeting**.
+They're intentionally narrow because speaker diarization is off — the
+pipeline doesn't promise per-speaker attribution.
 
-```bash
-momo
-```
+Click **🚀 Start summarizing**. The pipeline runs locally and shows a
+step-by-step progress card:
 
-### 4. What you get
+![progress card](docs/screenshots/06-progress.png)
 
-```text
-runs/{run_id}/
-  summaries/
-    final_summary.md       # the recap you share
-    final_summary.json     # structured output
-  evidence/
-    summary_evidence.md    # timestamps, support levels, transcript snippets
-    final_summary.with_evidence.json
-  transcript/
-    normalized_transcript.md
-    raw_transcript.json
-  chunks/
-    chunk_analysis.jsonl
-```
+### Step 3 — Read the result
 
-To tune ASR decoding, LLM provider/model, chunk sizes, output sections, or
-evidence toggles, edit `meeting_profile.md`.
+![summary tab](docs/screenshots/04-result-summary.png)
 
-## Output
+Five tabs: **📄 Summary** · **▶ Watch with evidence** · **🔎 Evidence**
+· **📜 Transcript** · **📦 Files**.
 
-- `summaries/final_summary.md` — **Final recap.** TL;DR, key topics, decisions,
-  action items, next meeting, worth-noting. Prose and tables.
-- `evidence/summary_evidence.md` — **Evidence file.** Each item from the recap
-  with the transcript snippet it came from, the timestamp range, and a
-  confidence label (`strong` = direct quote, `weak` = paraphrase,
-  `inferred` = reasoned from context).
+Each topic, decision, and worth-noting item carries the timestamp range
+where it appeared. Click any ▶ HH:MM:SS chip on the **Watch with
+evidence** tab and the video player re-anchors to that moment — useful
+for double-checking the AI's call before pasting the recap into Slack.
+
+![playback chips](docs/screenshots/05-playback-chips.png)
+
+> Wall-clock times by mode, language behavior, CLI alternative → [docs/USAGE.md](docs/USAGE.md)
 
 ## References
 
-- OpenAI Whisper: https://github.com/openai/whisper
-- Whisper paper: https://cdn.openai.com/papers/whisper.pdf
-- OpenAI Whisper announcement: https://openai.com/index/whisper/
-- Ollama docs: https://docs.ollama.com/
-- PyTorch install selector: https://pytorch.org/get-started/locally/
-- Qwen model family: https://qwen.moe/
+### Research context behind the recap LLM
 
-Thanks to the teams behind Whisper, Ollama, PyTorch, and Qwen — MOMO would
-not exist without these projects.
+MOMO uses published ideas as implementation guidance, but not every
+paper below is a one-to-one reproduction:
+
+- **Chain-of-Verification (CoVe)-style checking** — Dhuliawala et al.,
+  2023. MOMO has a simplified claim-checking pass that verifies draft
+  claims against transcript evidence windows.
+  ([paper](https://arxiv.org/abs/2309.11495))
+- **Chain-of-Thought / reasoning-prompting inspiration** — Wei et al.,
+  2022. Slot extraction runs with model thinking enabled while locating
+  evidence, then returns constrained JSON.
+  ([paper](https://arxiv.org/abs/2201.11903))
+- **Recursive decomposition for long documents** — Wu et al. (OpenAI),
+  2021. Thorough mode uses chunk/slot decomposition for long meetings;
+  it does not use the paper's human-feedback training setup.
+  ([paper](https://arxiv.org/abs/2109.10862))
+- **Extractive salience background** — TextRank (Mihalcea & Tarau,
+  2004) is background for extractive ranking, but MOMO currently uses a
+  simpler lexical required-hit/keyword gate, not graph-based TextRank.
+  ([paper](https://aclanthology.org/W04-3252/))
+- **Meeting summarization context** — QMSum (Zhong et al., 2021)
+  motivates query/user-directed meeting summarization.
+  ([paper](https://arxiv.org/abs/2104.05938))
+
+> Where each technique lives in the codebase → [docs/REFERENCES.md](docs/REFERENCES.md)
+
+### Tools and models
+
+- OpenAI Whisper: https://github.com/openai/whisper
+- Ollama: https://docs.ollama.com/
+- PyTorch: https://pytorch.org/get-started/locally/
+- Qwen: https://qwen.moe/
+
+Thanks to the teams behind Whisper, Ollama, PyTorch, and Qwen — MOMO
+would not exist without these projects.

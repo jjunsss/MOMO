@@ -30,21 +30,24 @@ not silently fall back to CPU transcription.
 
 ## Defaults
 
-The Colab notebook uses quality-first defaults:
+The Colab notebook uses trial-stable defaults:
 
-- Whisper `large-v3`
+- Whisper `medium`
 - Ollama `qwen3.5:9b`
-- thorough LLM summary mode
-- AI critique enabled
+- `8192` token LLM context
+- PyTorch CUDA 12.4 wheels
+- fast LLM summary mode
+- AI critique disabled
 - Korean output by default
 
-For a faster quick check, change these notebook variables before running
-the pipeline cell:
+For a slower quality pass, change these notebook variables before
+running the pipeline cell:
 
 ```python
-ASR_MODEL = "medium"
-SUMMARY_MODE = "fast"
-ENABLE_CRITIQUE = "false"
+ASR_MODEL = "large-v3"
+LLM_NUM_CTX = "32768"
+SUMMARY_MODE = "thorough"
+ENABLE_CRITIQUE = "true"
 ```
 
 The output language is controlled by:

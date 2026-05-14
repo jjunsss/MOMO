@@ -37,6 +37,7 @@ final_summary.json ── deterministic render ──▶ final_summary.md
 ```
 
 > Stage table, output artifacts, defaults → [docs/PIPELINE.md](docs/PIPELINE.md)
+> Colab trial uses lighter runtime defaults for stability → [docs/COLAB.md](docs/COLAB.md)
 
 ## Choose your path
 

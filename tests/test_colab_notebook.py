@@ -17,6 +17,12 @@ class ColabNotebookTest(unittest.TestCase):
 
         self.assertIn("MOMO Colab Quick Trial", source)
         self.assertIn("torch.cuda.is_available", source)
+        self.assertIn('ASR_MODEL = "medium"', source)
+        self.assertIn('LLM_NUM_CTX = "8192"', source)
+        self.assertIn('TORCH_INDEX_URL = "https://download.pytorch.org/whl/cu124"', source)
+        self.assertIn('"torch", "torchaudio", "--index-url", TORCH_INDEX_URL', source)
+        self.assertIn('SUMMARY_MODE = "fast"', source)
+        self.assertIn('ENABLE_CRITIQUE = "false"', source)
         self.assertIn("ollama\", \"pull", source)
         self.assertIn("meeting_ai.cli", source)
         self.assertIn("files.upload", source)

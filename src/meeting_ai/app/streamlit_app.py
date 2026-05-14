@@ -50,7 +50,11 @@ from meeting_ai.app.playback import (  # noqa: E402
     is_audio_only,
     load_with_evidence,
 )
-from meeting_ai.app.quality import LLMQualityIssue, check_llm_ready  # noqa: E402
+from meeting_ai.app.quality import (  # noqa: E402
+    LLMQualityIssue,
+    check_gpu_status,
+    check_llm_ready,
+)
 from meeting_ai.app.runner import PipelineRunner  # noqa: E402
 from meeting_ai.app.stages import (  # noqa: E402
     hint as stage_hint,
@@ -204,6 +208,8 @@ def _render_sidebar() -> None:
     with st.sidebar:
         st.markdown("## " + t("brand.title"))
         st.caption(t("brand.tagline"))
+        _render_gpu_status_panel()
+        st.divider()
         _render_language_toggle()
         st.divider()
 
@@ -232,6 +238,19 @@ def _render_sidebar() -> None:
         st.divider()
         with st.expander(t("sidebar.advanced"), expanded=False):
             _render_advanced_settings()
+
+
+def _render_gpu_status_panel() -> None:
+    status = check_gpu_status()
+    st.session_state["gpu_status_ok"] = status.ok
+    label = "{0}: {1}".format(t("gpu.label"), t("gpu.on") if status.ok else t("gpu.off"))
+    if status.ok:
+        st.success(label)
+        st.caption(t("gpu.on_detail", status.name or "CUDA"))
+        return
+
+    st.error(label)
+    st.warning(t("gpu.off_warning", status.detail or status.code))
 
 
 def _render_language_toggle() -> None:
@@ -373,14 +392,20 @@ def _render_new_run_form() -> None:
     title, instruction_text, topics_text, must_check_text = _render_summary_guide_section()
 
     st.markdown("---")
-    disabled = source_path is None
+    gpu_ok = bool(st.session_state.get("gpu_status_ok"))
+    disabled = source_path is None or not gpu_ok
+    disabled_help = None
+    if source_path is None:
+        disabled_help = t("cta.start_disabled_help")
+    elif not gpu_ok:
+        disabled_help = t("cta.gpu_disabled_help")
     st.markdown('<div class="momo-cta">', unsafe_allow_html=True)
     if st.button(
         t("cta.start"),
         type="primary",
         use_container_width=True,
         disabled=disabled,
-        help=t("cta.start_disabled_help") if disabled else None,
+        help=disabled_help,
     ):
         _kickoff_run(
             source_path=source_path,  # type: ignore[arg-type]

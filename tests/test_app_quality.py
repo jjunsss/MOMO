@@ -7,7 +7,7 @@ import unittest
 from io import BytesIO
 from unittest.mock import patch
 
-from meeting_ai.app.quality import check_llm_ready
+from meeting_ai.app.quality import check_gpu_status, check_llm_ready
 
 
 class _FakeResponse:
@@ -26,7 +26,58 @@ class _FakeResponse:
         return BytesIO(self._body).read()
 
 
+class _FakeCuda:
+    def __init__(self, available: bool, name: str = "RTX Test") -> None:
+        self._available = available
+        self._name = name
+
+    def is_available(self) -> bool:
+        return self._available
+
+    def device_count(self) -> int:
+        return 1 if self._available else 0
+
+    def get_device_name(self, index: int) -> str:
+        return self._name
+
+
+class _FakeTorch:
+    def __init__(self, cuda: _FakeCuda) -> None:
+        self.cuda = cuda
+
+
 class AppQualityTest(unittest.TestCase):
+    def test_gpu_status_reports_on_when_cuda_visible(self) -> None:
+        with patch(
+            "meeting_ai.app.quality.import_module",
+            return_value=_FakeTorch(_FakeCuda(True, "NVIDIA Test GPU")),
+        ):
+            status = check_gpu_status()
+
+        self.assertTrue(status.ok)
+        self.assertEqual(status.code, "cuda_available")
+        self.assertEqual(status.name, "NVIDIA Test GPU")
+
+    def test_gpu_status_reports_off_when_cuda_missing(self) -> None:
+        with patch(
+            "meeting_ai.app.quality.import_module",
+            return_value=_FakeTorch(_FakeCuda(False)),
+        ):
+            status = check_gpu_status()
+
+        self.assertFalse(status.ok)
+        self.assertEqual(status.code, "cuda_unavailable")
+
+    def test_gpu_status_reports_off_when_torch_missing(self) -> None:
+        with patch(
+            "meeting_ai.app.quality.import_module",
+            side_effect=ImportError("no torch"),
+        ):
+            status = check_gpu_status()
+
+        self.assertFalse(status.ok)
+        self.assertEqual(status.code, "torch_missing")
+
     def test_missing_provider_is_reported(self) -> None:
         issue = check_llm_ready({"llm": {"model": "qwen3.5:9b"}})
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from importlib import import_module
 from typing import Any, Dict, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -22,6 +23,70 @@ class LLMQualityIssue:
     provider: str
     model: str
     detail: str = ""
+
+
+@dataclass(frozen=True)
+class GPUStatus:
+    """CUDA visibility state shown in the GUI before a run starts."""
+
+    ok: bool
+    code: str
+    name: str = ""
+    detail: str = ""
+    device_count: int = 0
+
+
+def check_gpu_status() -> GPUStatus:
+    """Return whether PyTorch can see a CUDA GPU for ASR/LLM runs."""
+    try:
+        torch = import_module("torch")
+    except ImportError as exc:
+        return GPUStatus(
+            ok=False,
+            code="torch_missing",
+            detail=str(exc) or "PyTorch is not installed",
+        )
+
+    cuda = getattr(torch, "cuda", None)
+    if cuda is None:
+        return GPUStatus(
+            ok=False,
+            code="cuda_module_missing",
+            detail="torch.cuda is not available",
+        )
+
+    try:
+        available = bool(cuda.is_available())
+    except Exception as exc:  # pragma: no cover - defensive for broken torch installs
+        return GPUStatus(
+            ok=False,
+            code="cuda_check_failed",
+            detail=str(exc),
+        )
+
+    try:
+        device_count = int(cuda.device_count())
+    except Exception:  # pragma: no cover - device_count should be cheap and stable
+        device_count = 0
+
+    if not available:
+        return GPUStatus(
+            ok=False,
+            code="cuda_unavailable",
+            detail="torch.cuda.is_available() returned false",
+            device_count=device_count,
+        )
+
+    try:
+        name = str(cuda.get_device_name(0))
+    except Exception:  # pragma: no cover - rare driver/runtime edge case
+        name = "CUDA device"
+    return GPUStatus(
+        ok=True,
+        code="cuda_available",
+        name=name,
+        device_count=max(device_count, 1),
+    )
 
 
 def check_llm_ready(

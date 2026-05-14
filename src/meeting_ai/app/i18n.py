@@ -84,6 +84,17 @@ _STRINGS: Dict[str, Dict[Language, str]] = {
             "(e.g. 3D Gaussian, SDS, Whisper) are preserved verbatim either way."
         ),
     },
+    "gpu.label": {"ko": "GPU", "en": "GPU"},
+    "gpu.on": {"ko": "ON", "en": "ON"},
+    "gpu.off": {"ko": "OFF", "en": "OFF"},
+    "gpu.on_detail": {
+        "ko": "{0} 사용 가능",
+        "en": "{0} available",
+    },
+    "gpu.off_warning": {
+        "ko": "주의: CUDA GPU를 사용할 수 없습니다. MOMO는 CPU fallback 없이 중단됩니다. 상세: {0}",
+        "en": "Warning: CUDA GPU is not available. MOMO stops instead of using CPU fallback. Detail: {0}",
+    },
 
     # ─── LLM readiness ────────────────────────────────────────────
     "quality.missing_provider": {
@@ -242,6 +253,10 @@ _STRINGS: Dict[str, Dict[Language, str]] = {
     "cta.start_disabled_help": {
         "ko": "영상을 먼저 선택해 주세요.",
         "en": "Pick a recording first.",
+    },
+    "cta.gpu_disabled_help": {
+        "ko": "GPU OFF 상태에서는 분석을 시작할 수 없습니다.",
+        "en": "Cannot start while GPU is OFF.",
     },
 
     # ─── Progress ─────────────────────────────────────────────────

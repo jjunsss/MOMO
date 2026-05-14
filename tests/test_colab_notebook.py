@@ -24,6 +24,9 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn("Visual guide / 화면 안내", source)
         self.assertIn("colab-01-runtime-menu.svg", source)
         self.assertIn("colab-04-run-cells-upload.svg", source)
+        self.assertIn("Tuesday Introduction Recording", source)
+        self.assertIn("https://serc.carleton.edu/download/files/440949/tuesday_introduction_recording.mp4", source)
+        self.assertIn("CC BY-NC-SA 3.0", source)
         self.assertIn("10분 이상 걸려도 더 좋은 품질", source)
         self.assertIn("For higher quality, if a 10+ minute", source)
         self.assertIn("따옴표 안의 글자만 바꾸면 됩니다", source)
@@ -51,6 +54,16 @@ class ColabNotebookTest(unittest.TestCase):
         self.assertIn("Most important", guide)
         self.assertIn("must_check", guide)
         self.assertIn("English technical names", guide)
+
+    def test_colab_docs_include_public_sample_link(self) -> None:
+        guide = Path("docs/COLAB.md").read_text(encoding="utf-8")
+
+        self.assertIn("Tuesday Introduction Recording", guide)
+        self.assertIn(
+            "https://serc.carleton.edu/download/files/440949/tuesday_introduction_recording.mp4",
+            guide,
+        )
+        self.assertIn("Creative Commons BY-NC-SA 3.0", guide)
 
     def test_colab_visual_guide_assets_are_documented(self) -> None:
         guide = Path("docs/COLAB.md").read_text(encoding="utf-8")

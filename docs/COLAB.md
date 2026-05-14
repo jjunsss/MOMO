@@ -24,6 +24,12 @@ runtime is reset. For confidential recordings, use the local/server GUI.
 4. Upload one `.mp4`, `.mkv`, `.mov`, `.m4a`, `.mp3`, or `.wav`.
 5. Edit the topic-details cell if you want meeting-specific focus terms.
 
+No recording yet? For a quick public test, download this small sample
+MP4 and upload it in the notebook:
+
+- Sample: [Tuesday Introduction Recording](https://serc.carleton.edu/download/files/440949/tuesday_introduction_recording.mp4)
+- Source and license: [SERC file page](https://serc.carleton.edu/details/files/440949.html), Creative Commons BY-NC-SA 3.0, non-commercial reuse with attribution
+
 The notebook fails early when `torch.cuda.is_available()` is false.
 MOMO also configures Whisper with `MOMO_ASR_DEVICE=cuda`, so it does
 not silently fall back to CPU transcription.

@@ -106,8 +106,11 @@ Free Colab GPU availability varies by account and time.
 
 **Ollama did not start**
 
-Restart the Colab runtime and rerun from the top. If it fails again,
-check `/tmp/momo_ollama.log` in the notebook.
+The notebook installs Ollama from the Linux archive package, not from
+`curl ... install.sh`. Restart the Colab runtime and rerun from the top.
+If it fails again, check `/tmp/momo_ollama.log` in the notebook. If the
+download itself fails, rerun the Ollama cell once; Colab/network
+transient failures are common during large downloads.
 
 **Model pull is slow**
 

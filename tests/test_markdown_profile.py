@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from meeting_ai.config.markdown_profile import load_markdown_profile
 from meeting_ai.config.topic_details import apply_topic_details
@@ -30,8 +31,8 @@ class MarkdownProfileTest(unittest.TestCase):
         self.assertTrue(rendering["include_evidence_snippets"])
         self.assertTrue(rendering["write_transcript_markdown"])
         self.assertTrue(rendering["write_evidence_report"])
-        self.assertEqual(rendering["llm_summary_mode"], "fast")
-        self.assertFalse(rendering["enable_critique"])
+        self.assertEqual(rendering["llm_summary_mode"], "thorough")
+        self.assertTrue(rendering["enable_critique"])
 
         keywords = loaded["pipeline_config"]["extraction"]["keywords"]
         self.assertIn("결정", keywords["decision"])
@@ -55,6 +56,28 @@ class MarkdownProfileTest(unittest.TestCase):
             "비주얼 피처와 텍스트 임베딩의 역할과 결론을 구분한다",
             {term["label"] for term in loaded["profile"]["verification_terms"]},
         )
+
+    def test_environment_overrides_container_runtime_values(self):
+        with patch.dict(
+            "os.environ",
+            {
+                "MOMO_LLM_BASE_URL": "http://ollama:11434",
+                "MOMO_LLM_MODEL": "qwen3.5:9b",
+                "MOMO_ASR_DEVICE": "cuda",
+                "MOMO_OUTPUT_LANGUAGE": "en",
+            },
+        ):
+            loaded = load_markdown_profile(Path("meeting_profile.md"))
+
+        self.assertEqual(loaded["models_config"]["llm"]["base_url"], "http://ollama:11434")
+        self.assertEqual(loaded["models_config"]["llm"]["model"], "qwen3.5:9b")
+        self.assertEqual(loaded["models_config"]["asr"]["device"], "cuda")
+        self.assertEqual(loaded["profile"]["meeting_profile"]["output_language"], "en")
+
+    def test_environment_override_rejects_invalid_integer(self):
+        with patch.dict("os.environ", {"MOMO_LLM_NUM_CTX": "not-an-int"}):
+            with self.assertRaisesRegex(ValueError, "MOMO_LLM_NUM_CTX"):
+                load_markdown_profile(Path("meeting_profile.md"))
 
 
 if __name__ == "__main__":

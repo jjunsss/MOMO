@@ -63,6 +63,11 @@ def _verification_terms_block(profile: Dict[str, Any]) -> str:
     return "\n".join(rows) if rows else "(없음)"
 
 
+def _custom_instruction_block(profile: Dict[str, Any]) -> str:
+    instruction = (profile.get("custom_instruction") or "").strip()
+    return instruction if instruction else "(없음)"
+
+
 def _required_report_json(required_search_report: List[Dict[str, Any]]) -> str:
     return json.dumps(required_search_report, ensure_ascii=False, sort_keys=True)
 
@@ -405,6 +410,7 @@ def synthesize_direct_with_llm(
             "meeting_duration": meeting_duration,
             "source_file": source_file,
             "output_language": profile.get("meeting_profile", {}).get("output_language", "ko"),
+            "custom_instruction": _custom_instruction_block(profile),
             "required_items": _required_items_block(profile),
             "custom_topics": _custom_topics_block(profile),
             "verification_terms": _verification_terms_block(profile),

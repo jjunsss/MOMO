@@ -34,7 +34,7 @@ output_language: ko
 asr_preset: best
 asr_model: large-v3
 asr_language: ko
-asr_device: auto
+asr_device: cuda
 asr_temperature: 0.0
 asr_condition_on_previous_text: false
 asr_no_speech_threshold: 0.6
@@ -46,8 +46,7 @@ chunk_max_minutes: 10
 chunk_overlap_seconds: 30
 
 # LLM 합성기 설정 (요약 품질을 좌우합니다)
-# llm_provider: deterministic_mvp | ollama | openai_compatible
-#   - deterministic_mvp = LLM 없음, 규칙 기반 (현재 기본)
+# llm_provider: ollama | openai_compatible
 #   - ollama = 로컬 Ollama 서버 (예: ollama serve + ollama pull qwen2.5:14b)
 #   - openai_compatible = OpenAI/OpenRouter/vLLM 등 OpenAI 호환 엔드포인트
 # llm_base_url: ollama 는 http://localhost:11434, openai 는 https://api.openai.com/v1
@@ -61,13 +60,13 @@ llm_request_timeout_seconds: 1800
 llm_api_key_env: OPENAI_API_KEY
 
 # 출력 한도 (LLM 합성기에서만 적용됩니다)
-llm_summary_mode: fast             # fast=1회 호출, thorough=슬롯별 추출+2-pass 합성
+llm_summary_mode: thorough         # fast=1회 호출, thorough=슬롯별 추출+2-pass 합성
 worth_noting_max: 8
 key_topics_max: 8
 max_items_per_slot: 8
 single_pass_token_limit: 60000   # transcript가 이보다 작으면 슬롯별 single-pass, 크면 hierarchical
 direct_summary_max_tokens: 8192
-enable_critique: false            # true면 fast에서도 critique 1회 추가 호출
+enable_critique: true             # true면 요약 초안을 한 번 더 검토
 
 ---
 
@@ -84,7 +83,7 @@ enable_critique: false            # true면 fast에서도 critique 1회 추가 �
 - [x] action_items | Action Items | checklist
 - [x] next_meeting | 다음 미팅 / Follow-up | table
 - [x] worth_noting | Worth Noting | bullets
-- [x] open_questions | Open Questions | bullets
+- [ ] open_questions | Open Questions | bullets
 - [ ] required_search_report | 사용자 필수 탐색 항목 결과 | table
 - [ ] appendix | Appendix | metadata
 

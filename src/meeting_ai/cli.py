@@ -9,6 +9,7 @@ from typing import List, Optional
 
 from meeting_ai.config.loader import load_models_config, load_pipeline_config, load_user_profile
 from meeting_ai.config.markdown_profile import load_markdown_profile
+from meeting_ai.config.runtime_overrides import apply_environment_overrides
 from meeting_ai.config.topic_details import apply_topic_details
 from meeting_ai.nodes.source_discovery import derive_run_id, find_latest_media
 from meeting_ai.pipeline import process_transcript_source
@@ -59,11 +60,7 @@ def run_process(args: argparse.Namespace) -> int:
     if args.profile_md:
         loaded = _load_markdown_runtime(args.profile_md, args.topic_details)
     else:
-        loaded = {
-            "profile": load_user_profile(args.profile),
-            "pipeline_config": load_pipeline_config(args.pipeline_config),
-            "models_config": load_models_config(args.models_config),
-        }
+        loaded = _load_yaml_runtime(args.profile, args.pipeline_config, args.models_config)
     profile = loaded["profile"]
     pipeline_config = loaded["pipeline_config"]
     models_config = loaded["models_config"]
@@ -115,6 +112,20 @@ def run_auto(args: argparse.Namespace) -> int:
 def _load_markdown_runtime(profile_md: Path, topic_details: Optional[Path]) -> dict:
     loaded = load_markdown_profile(profile_md)
     return apply_topic_details(loaded, topic_details)
+
+
+def _load_yaml_runtime(profile: Path, pipeline_config: Path, models_config: Path) -> dict:
+    loaded = {
+        "profile": load_user_profile(profile),
+        "pipeline_config": load_pipeline_config(pipeline_config),
+        "models_config": load_models_config(models_config),
+    }
+    apply_environment_overrides(
+        loaded["profile"],
+        loaded["pipeline_config"],
+        loaded["models_config"],
+    )
+    return loaded
 
 
 def run_render(args: argparse.Namespace) -> int:

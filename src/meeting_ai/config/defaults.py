@@ -115,8 +115,8 @@ def default_pipeline_config() -> Dict[str, Any]:
             "max_items_per_slot": 8,
             "single_pass_token_limit": 60_000,
             "direct_summary_max_tokens": 8192,
-            "llm_summary_mode": "fast",
-            "enable_critique": False,
+            "llm_summary_mode": "thorough",
+            "enable_critique": True,
         },
     }
 
@@ -127,7 +127,7 @@ def default_models_config() -> Dict[str, Any]:
             "provider": "openai_whisper",
             "model": "large-v3",
             "language": "auto",
-            "device": "auto",
+            "device": "cuda",
             "fp16": True,
             "temperature": 0.0,
             "condition_on_previous_text": False,
@@ -137,11 +137,13 @@ def default_models_config() -> Dict[str, Any]:
             "diarization": False,
         },
         "llm": {
-            "provider": "deterministic_mvp",
-            "model": "rule_based",
+            "provider": "ollama",
+            "model": "qwen3.5:9b",
+            "base_url": "http://localhost:11434",
+            "request_timeout_seconds": 1800,
+            "num_ctx": 65536,
             "temperature": 0.0,
             "structured_outputs": True,
         },
         "embedding": {"provider": "none", "model": "none"},
-        "fallbacks": {"allow_cloud_llm": False, "allow_cloud_asr": False},
     }

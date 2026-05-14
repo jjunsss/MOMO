@@ -4,6 +4,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .claude/
+.momo/
 planner/
 AGENTS.md
 CLAUDE.md

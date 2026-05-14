@@ -11,5 +11,5 @@ rendering:
   output_language: ko
   include_timestamps: true
   include_skipped_chunk_stats: true
-  llm_summary_mode: fast
-  enable_critique: false
+  llm_summary_mode: thorough
+  enable_critique: true

@@ -1,0 +1,71 @@
+services:
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MOMO_OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: 1m
+    gpus: ${MOMO_DOCKER_GPUS:-all}
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  ollama-pull:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      MOMO_LLM_MODEL: ${MOMO_LLM_MODEL:-qwen3.5:9b}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        tries=0
+        until ollama list >/dev/null 2>&1; do
+          tries=$$((tries + 1))
+          if [ "$$tries" -gt 60 ]; then
+            echo "Timed out waiting for Ollama." >&2
+            exit 1
+          fi
+          sleep 2
+        done
+        ollama pull "$${MOMO_LLM_MODEL}"
+
+  momo:
+    build:
+      context: .
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    user: "${MOMO_UID:-1000}:${MOMO_GID:-1000}"
+    ports:
+      - "${MOMO_GUI_PORT:-8501}:8501"
+    volumes:
+      - ./videos:/app/videos
+      - ./runs:/app/runs
+      - whisper-cache:/home/momo/.cache/whisper
+      - ./topic_details.json:/app/topic_details.json
+      - ./meeting_profile.md:/app/meeting_profile.md:ro
+    environment:
+      MOMO_LLM_PROVIDER: ollama
+      MOMO_LLM_MODEL: ${MOMO_LLM_MODEL:-qwen3.5:9b}
+      MOMO_LLM_BASE_URL: http://ollama:11434
+      MOMO_LLM_NUM_CTX: "65536"
+      MOMO_LLM_REQUEST_TIMEOUT_SECONDS: "1800"
+      MOMO_ASR_DEVICE: cuda
+      MOMO_ASR_MODEL: large-v3
+      MOMO_LLM_SUMMARY_MODE: thorough
+      MOMO_ENABLE_CRITIQUE: "true"
+    gpus: ${MOMO_DOCKER_GPUS:-all}
+
+volumes:
+  ollama:
+  whisper-cache:

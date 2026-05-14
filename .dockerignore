@@ -1,0 +1,13 @@
+.git
+.momo
+.pytest_cache
+.ruff_cache
+.streamlit
+.venv
+__pycache__
+*.pyc
+runs/*
+!runs/.gitkeep
+videos/*
+!videos/.gitkeep
+docs/screenshots

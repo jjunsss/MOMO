@@ -73,27 +73,20 @@ def capture() -> int:
         print("\n1) home (English)")
         _save(page, "01-home.png")
 
-        # ── 2. Summary guide close-up
-        print("\n2) summary guide close-up")
-        guide = page.locator("text=Tell the AI what to focus on").first
-        guide.scroll_into_view_if_needed()
+        # ── 2. Summary guide close-up — capture the whole bordered
+        # container so the reader can see every field the README lists
+        # below the image (free-form / title / topics / confusion watch).
+        # locator.screenshot() captures the full element regardless of
+        # viewport height, which a `clip=` rectangle cannot.
+        print("\n2) summary guide close-up (full panel)")
+        guide_text = page.locator("text=Tell the AI what to focus on").first
+        guide_text.scroll_into_view_if_needed()
         _settle(page, 400)
-        bbox = guide.evaluate(
-            "el => { const c = el.closest('[data-testid=\"stVerticalBlockBorderWrapper\"]')"
-            "      || el.closest('[data-testid=\"stVerticalBlock\"]')"
-            "      || el; const r = c.getBoundingClientRect();"
-            "  return {x: r.left, y: r.top, width: r.width, height: r.height}; }"
-        )
-        if bbox and bbox["width"] > 100 and bbox["height"] > 100:
-            clip = {
-                "x": max(0, bbox["x"]),
-                "y": max(0, bbox["y"]),
-                "width": min(VIEWPORT["width"], bbox["width"]),
-                "height": min(VIEWPORT["height"], bbox["height"]),
-            }
-            _save(page, "02-summary-guide.png", clip=clip)
-        else:
-            _save(page, "02-summary-guide.png")
+        container = page.locator(
+            '[data-testid="stVerticalBlockBorderWrapper"]'
+        ).filter(has_text="Tell the AI what to focus on").first
+        container.screenshot(path=str(OUT_DIR / "02-summary-guide.png"))
+        print("  → wrote docs/screenshots/02-summary-guide.png")
 
         # ── 3. Template applied (Research)
         print("\n3) template applied (Research)")

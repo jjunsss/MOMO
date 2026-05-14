@@ -2,7 +2,8 @@
 
 MOMO turns long Zoom recordings into Markdown meeting recaps with
 evidence-anchored timestamps. Drop a file, write a few lines about
-what you want, click start. Everything runs locally on your GPU.
+what you want, click start. Local/server mode runs on your own GPU;
+Colab trial mode runs in a temporary hosted GPU runtime.
 
 ![home page](docs/screenshots/01-home.png)
 
@@ -37,7 +38,21 @@ final_summary.json ── deterministic render ──▶ final_summary.md
 
 > Stage table, output artifacts, defaults → [docs/PIPELINE.md](docs/PIPELINE.md)
 
-## Requirements
+## Choose your path
+
+| Path | Best for | Start |
+|---|---|---|
+| **Colab trial** | First-time users who want to try MOMO without touching a server. | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jjunsss/MOMO/blob/main/notebooks/MOMO_Colab.ipynb) |
+| **Local/server GUI** | Repeated use, private recordings, long meetings, and team/shared machines. | `scripts/start-gui.sh` |
+
+Colab runs in a Google-hosted GPU runtime and writes the same `runs/`
+artifacts as the local CLI. Use it as the lightweight evaluation path.
+For confidential meetings or regular production use, run the local/server
+GUI so files and model caches stay on your own machine.
+
+> Colab walkthrough → [docs/COLAB.md](docs/COLAB.md)
+
+## Local/server requirements
 
 Before installing, the server only needs:
 
@@ -64,7 +79,7 @@ nvidia-smi
 
 Docker users also need Docker Compose v2 and NVIDIA Container Toolkit.
 
-## Quick start
+## Local/server quick start
 
 ```bash
 git clone https://github.com/jjunsss/MOMO.git
@@ -77,9 +92,9 @@ If `8501` is busy, MOMO automatically tries `8502` through `8510`.
 First run downloads a few GB of models; **every later launch is the
 same command** and skips the install in seconds.
 
-> Other ways to install → [docs/INSTALL.md](docs/INSTALL.md)
+> Shell and Docker install details → [docs/INSTALL.md](docs/INSTALL.md)
 
-## How to use
+## How to use the local GUI
 
 The interface speaks **Korean and English** (toggle in the sidebar).
 Three steps.

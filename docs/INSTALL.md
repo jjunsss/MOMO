@@ -1,10 +1,14 @@
-# Alternative install paths
+# Local/server install paths
 
-The basic install is just `scripts/start-gui.sh` (see the
-[README Quick start](../README.md#quick-start)). This page only
-covers what the shell installer handles automatically and the
-Docker Compose path — both fully automated, no manual server setup
-required.
+For first-time evaluators who do not want a local install, use the
+[Colab trial notebook](COLAB.md). This page is for local/server users
+who want the GUI on their own machine.
+
+The basic local install is just `scripts/start-gui.sh` (see the
+[README Local/server quick start](../README.md#localserver-quick-start)).
+This page covers what the shell installer handles automatically and
+the Docker Compose path — both fully automated, no manual server setup
+required after the host GPU driver is working.
 
 ## What the shell installer handles
 

@@ -1,6 +1,6 @@
-# Using MOMO
+# Using the local GUI
 
-The interface speaks **Korean and English** — toggle in the sidebar.
+The local GUI speaks **Korean and English** — toggle in the sidebar.
 The whole flow is three steps: drop a recording, tell the AI what to
 focus on, hit start.
 

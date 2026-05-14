@@ -16,6 +16,7 @@ class ColabNotebookTest(unittest.TestCase):
         )
 
         self.assertIn("MOMO Colab Quick Trial", source)
+        self.assertIn("초보자 / Beginner", source)
         self.assertIn("셀을 위에서 아래로 하나씩 실행하세요", source)
         self.assertIn("Run each cell one by one from top to bottom", source)
         self.assertIn("GPU 확인", source)

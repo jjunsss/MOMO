@@ -43,8 +43,8 @@ final_summary.json ── deterministic render ──▶ final_summary.md
 
 | Path | Best for | Start |
 |---|---|---|
-| **Colab trial** | First-time users who want to try MOMO without touching a server. | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jjunsss/MOMO/blob/main/notebooks/MOMO_Colab.ipynb) |
-| **Local/server GUI** | Repeated use, private recordings, long meetings, and team/shared machines. | `scripts/start-gui.sh` |
+| **Colab trial (초보자 / Beginner)** | First-time users who want to try MOMO without touching a server. | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jjunsss/MOMO/blob/main/notebooks/MOMO_Colab.ipynb) |
+| **Local/server GUI (반복 사용자 / Regular user)** | Repeated use, private recordings, long meetings, and team/shared machines. | `scripts/start-gui.sh` |
 
 Colab runs in a Google-hosted GPU runtime and writes the same `runs/`
 artifacts as the local CLI. Use it as the lightweight evaluation path.

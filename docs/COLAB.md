@@ -9,8 +9,8 @@ Docker, Python, CUDA, ffmpeg, or Ollama on their own machine.
 
 | User type | Recommended path | Why |
 |---|---|---|
-| First-time evaluator | **Colab trial** | Fastest way to upload one recording and inspect the summary quality. |
-| Local/server user | **GUI install** | Better for repeated use, private files, long meetings, and stable model caches. |
+| First-time evaluator (초보자 / Beginner) | **Colab trial** | Fastest way to upload one recording and inspect the summary quality. |
+| Local/server user (반복 사용자 / Regular user) | **GUI install** | Better for repeated use, private files, long meetings, and stable model caches. |
 
 Colab is intentionally a trial path. It uses a temporary Google-hosted
 runtime, so model downloads and uploaded files disappear when the
